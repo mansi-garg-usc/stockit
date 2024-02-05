@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+</head>
+
+<body>
+    <h1>Stock Information</h1>
+    <form id="stockForm">
+        <label for="stockSymbol">Stock Symbol:</label>
+        <input type="text" id="stockSymbol" name="stockTickerSymbol" required>
+        <button type="button" onclick="getStockInfo()">Get Stock Info</button>
+        <button type="button" onclick="getStockStatus()">Get Stock Status</button>
+        <button type="button" onclick="getStockRecommendationTrends()">Get Stock Recommendation</button>
+        <button type="button" onclick="getCompanyNews()">Get Company News</button>
+        <button type="button" onclick="getStockRecommendationTrends()">Get Stock Recommendation</button>
+        <button type="button" onclick="getStockHighCharts()">Get Stock High charts</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        function getStockInfo() {
+            var stockSymbol = document.getElementById("stockSymbol").value;
+            var apiUrl = '/api?stockTickerSymbol=' + encodeURIComponent(stockSymbol);
+
+            // Make an AJAX request using fetch
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data
+                    document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error fetching stock details:', error);
+                    document.getElementById("result").innerText = 'Error fetching stock details';
+                });
+        }
+
+        function getStockStatus() {
+
+            var stockSymbol = document.getElementById("stockSymbol").value;
+            var apiUrl = '/stockSummary?stockTickerSymbol=' + encodeURIComponent(stockSymbol);
+            // Make an AJAX request using fetch
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data
+                    document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error fetching stock details:', error);
+                    document.getElementById("result").innerText = 'Error fetching stock details';
+                });
+        }
+
+        function getStockRecommendationTrends() {
+
+            var stockSymbol = document.getElementById("stockSymbol").value;
+            var apiUrl = '/stockrecommendationTrends?stockTickerSymbol=' + encodeURIComponent(stockSymbol);
+            // Make an AJAX request using fetch
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data
+                    document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error fetching stock details:', error);
+                    document.getElementById("result").innerText = 'Error fetching stock details';
+                });
+        }
+
+        function getCompanyNews() {
+
+            var stockSymbol = document.getElementById("stockSymbol").value;
+            var apiUrl = '/companyNews?stockTickerSymbol=' + encodeURIComponent(stockSymbol);
+            // Make an AJAX request using fetch
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data
+                    document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error fetching stock details:', error);
+                    document.getElementById("result").innerText = 'Error fetching stock details';
+                });
+        }
+
+        function getStockHighCharts() {
+
+            var stockSymbol = document.getElementById("stockSymbol").value;
+            var apiUrl = '/highCharts?stockTickerSymbol=' + encodeURIComponent(stockSymbol);
+            // Make an AJAX request using fetch
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data
+                    document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error fetching stock details:', error);
+                    document.getElementById("result").innerText = 'Error fetching stock details';
+                });
+        }
+    </script>
+</body>
+
+</html>
