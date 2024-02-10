@@ -50,9 +50,13 @@ const attribute_mapping_news = {
   url: "link_to_post",
 };
 
-const attribute_mapping_charts = {
+const attribute_mapping_charts_close_price = {
   t: "date",
   c: "stock_price",
+};
+
+const attribute_mapping_charts_volume = {
+  t: "date",
   v: "volume",
 };
 
@@ -89,7 +93,6 @@ async function fetchStockInfo(stockTickerSymbol) {
 
     const modulatedData = modulateCompanyData(data);
     displayCompanyData(modulatedData);
-    const firstTabContent = document.getElementById("companyTabData");
     console.log(`data - ${JSON.stringify(data)}`);
     document.getElementById("resultData").style.display = "flex";
     document.getElementById("companyTabData").style.display = "flex";
@@ -111,7 +114,7 @@ async function fetchDataForTabs(stockTickerSymbol) {
       stockTickerSymbol
     )}`,
     highCharts: `/highCharts?stockTickerSymbol=${encodeURIComponent(
-      stockTickerSymbol
+      stockTickerSymbol.toUpperCase()
     )}`,
   };
 
@@ -125,7 +128,6 @@ async function fetchDataForTabs(stockTickerSymbol) {
 
     const dataForAllTabs = await Promise.all(promises);
 
-    console.log(`dataForAllTabs - ${JSON.stringify(dataForAllTabs)}`);
     dataForAllTabs.forEach(({ apiName, data }) => {
       const dataModulationFunction = dataModulationFunctionMap[apiName];
       const resultForEveryTab =
@@ -141,28 +143,6 @@ async function fetchDataForTabs(stockTickerSymbol) {
   } catch (error) {
     console.log(`error in fetchDataForAllTabs - ${error}`);
   }
-}
-
-function displayNews(response) {
-  let news_links = {};
-  for (attribute in response) {
-    if (attribute in attribute_mapping_news) {
-      news_links[attribute_mapping_news[attribute]] = response[attribute];
-    }
-  }
-  console.log(news_links);
-  return news_links;
-}
-
-function modulateCharts(response) {
-  let chart_data = {};
-  for (attribute in response) {
-    if (attribute in attribute_mapping_charts) {
-      chart_data[attribute_mapping_charts[attribute]] = response[attribute];
-    }
-  }
-  console.log(chart_data);
-  return chart_data;
 }
 
 function modulateCompanyData(response) {
@@ -229,12 +209,30 @@ function modulateNews(response) {
   return mappedNewsItems;
 }
 
-function modulateCharts() {}
+function modulateCharts(response) {
+  const data = response.results;
+  let closePriceData = [];
+  let volumeData = [];
+  for (let item of data) {
+    let mappedItem = [item["t"], item["c"]];
+    closePriceData.push(mappedItem);
+  }
+
+  for (let item of data) {
+    let volumeItem = [
+      item["t"], // Date
+      item["v"], // Volume
+    ];
+    volumeData.push(volumeItem);
+  }
+
+  return (modulatedHighChartsData = {
+    closePriceData: closePriceData,
+    volumeData: volumeData,
+  });
+}
 
 function clearSearchInput() {
-  // let searchText =  document.getElementById('searchText').value;
-  // searchText = searchText && '';
-
   document.getElementById("searchText").value = "";
   clearActiveTabsAndHideContent();
   isDataRetrieved = false;
@@ -276,7 +274,6 @@ function activateTab(tabIndex) {
     }
   });
 }
-
 
 function deactivateAllTabs() {
   const allTabs = document.querySelectorAll("#tabsList .tabButton");
@@ -433,10 +430,69 @@ function displayNewsData(newsData) {
     newsTable.appendChild(newsRow);
   });
 
-  // Assuming you have a container in your HTML with the ID 'newsTabData'
   const newsTabData = document.getElementById("newsTabData");
   newsTabData.innerHTML = ""; // Clear existing content
   newsTabData.appendChild(newsTable);
 }
 
-function displayChartsData() {}
+function highChartsClosePrice(data) {
+  const stockTickerSymbol = document
+    .getElementById("searchText")
+    .value.toUpperCase();
+  if (typeof HighCharts !== undefined) {
+    return Highcharts.stockChart("chartsTabData", {
+      rangeSelector: {
+        selected: 1,
+      },
+
+      title: {
+        text: `${stockTickerSymbol} Stock Price`,
+      },
+
+      navigator: {
+        series: {
+          accessibility: {
+            exposeAsGroupOnly: true,
+          },
+        },
+      },
+
+      series: [
+        {
+          name: `${stockTickerSymbol} Stock Price`,
+          data: data.closePriceData,
+          type: "area",
+          threshold: null,
+          tooltip: {
+            valueDecimals: 2,
+          },
+          fillColor: {
+            linearGradient: {
+              x1: 0,
+              y1: 0,
+              x2: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, Highcharts.getOptions().colors[0]],
+              [
+                1,
+                Highcharts.color(Highcharts.getOptions().colors[0])
+                  .setOpacity(0)
+                  .get("rgba"),
+              ],
+            ],
+          },
+        },
+      ],
+    });
+  } else {
+    console.log("high chart not loaded");
+  }
+}
+
+function displayChartsData(chartsData) {
+  const chartsTabData = document.getElementById("chartsTabData");
+  chartsTabData.innerHTML = "";
+  chartsTabData.appendChild(highChartsClosePrice(chartsData));
+}
