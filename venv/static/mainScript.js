@@ -65,111 +65,15 @@ function clearActiveTabsAndHideContent() {
   });
 }
 
-document.querySelectorAll(".tabButton").forEach((tab) => {
-  tab.addEventListener("click", () => activateTab(tab));
-});
-
-//document.getElementById("searchInput").addEventListener("submit", getStockData);
-
 async function getStockData() {
-  //   document.addEventListener("DOMContentLoaded", () => {
-  //     deactivateAllTabs();
-  //   });
-
-  // Remove 'active' class from all tabs
-  //   document.querySelectorAll("#tabsList .tabButton").forEach((tab) => {
-  //     tab.classList.remove("active");
-  //   });
-
-  // Add 'active' class to the clicked tab and display the content
-  //   tab.classList.add("active");
-  //   document.getElementById(targetContentId).style.display = "block";
   document
     .getElementById("searchInput")
     .addEventListener("submit", function (ev) {
       ev.preventDefault();
 
       const stockTickerSymbol = document.getElementById("searchText").value;
-      // let resultDiv = document.getElementById('resultData');
-      // resultDiv.innerHTML = '';
-
-      // const tabsDiv = document.createElement('div');
-      // tabsDiv.id = 'tabs';
-
-      // const tabHeaders = ['Company', 'StockSummary', 'Charts', 'Latest News'];
-      // tabHeaders.forEach(tabHeader => {
-      //     const tabHeaderButton = document.createElement('button');
-      //     tabHeaderButton.className = 'tab';
-      //     //tabHeaderButton.onclick =
-      //     tabHeaderButton.content = tabHeader;
-      //     tabsDiv.appendChild(tabHeaderButton);
-      // });
-
-      // tabHeaders.forEach(tabHeader => {
-      //     const tabData = document.createElement('div');
-      //     tabData.id = tabHeader.replace(/\s/g, '');
-      //     tabData.className = 'tab-data';
-      //     tabsDiv.appendChild(tabData);
-      // })
-
-      // resultDiv.appendChild(tabsDiv);
       fetchStockInfo(stockTickerSymbol);
       fetchDataForTabs(stockTickerSymbol);
-
-      // if (!isDataRetrieved && stockTickerSymbol ) {
-      //     document.getElementById('resultData').innerHTML = '';
-      //     fetch(`/stockInfo?stockTickerSymbol=${encodeURIComponent(stockTickerSymbol)}`)
-      //         .then((response) => response.json())  // Return the promise
-      //         .then((data) => {
-      //             console.log(data);
-      //             const displayContainer = document.getElementById('resultData');
-
-      //             const stockDataTabs = document.createElement('div');
-      //             stockDataTabs.id = 'stockDataTabs';
-
-      //             const stockDataTabNames = [company_tab_name, summary_tab_name, charts_tab_name, news_tab_name];
-      //             stockDataTabNames.forEach((stockDataTabName, index) => {
-      //                 const tabElement = document.createElement('div');
-      //                 tabElement.textContent = stockDataTabName;
-      //                 tabElement.className = 'stockDataTab';
-      //                 tabElement.addEventListener('click', () => {
-      //                     loadContentForTab(index, data);
-
-      //                     stockDataTabs.appendChild(tabElement);
-      //                 })
-      //             })
-
-      //             // displayContainer.innerHTML = `<p>${JSON.stringify(data)}<p>`;
-      //             console.log(modulateCompanyData(data))
-      //             let tableContainer = '<table>'
-      //             const companyData = modulateCompanyData(data)
-      //             for(let key in companyData) {
-      //                 tableContainer += '<tr>';
-      //                 tableContainer += `<td>${key}</td>`;
-      //                 tableContainer += `<td>${companyData[key]}</td>`;
-      //                 tableContainer += '</tr>';
-
-      //                 // const tr = tableContainer.insertRow();
-      //                 // const tdKey = tr.insertCell();
-      //                 // const tdValue = tr.insertCell();
-      //                 // tdKey.textContent = key;
-      //                 // tdValue.textContent = companyData[key];
-      //             }
-      //             tableContainer += '</table>';
-      //             console.log(tableContainer);
-      //             displayContainer.innerHTML = tableContainer;
-
-      //             // displayContainer.innerHTML = `<p>company data - ${JSON.stringify(modulateCompanyData(data))} </p> <br>
-      //             // <p>stock summary - ${JSON.stringify(modulateStockSummary(data))}</p> <br>
-      //             // <p>news - ${JSON.stringify(modulateNews(data))}</p> <br>
-      //             // <p>charts - ${JSON.stringify(modulateCharts(data))}</p> <br>`
-      //             isDataRetrieved = true;
-      //         }).catch((error) => {
-      //             console.error('Error in flask API: ', error);
-      //             document.getElementById("resultData").innerText = `Error fetching stock details: ${error}`;
-
-      //         })
-      // }
     });
 }
 
@@ -181,20 +85,15 @@ async function fetchStockInfo(stockTickerSymbol) {
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
-    const data = await response.json(); // Make sure to return the result of response.json()
+    const data = await response.json();
 
     const modulatedData = modulateCompanyData(data);
     displayCompanyData(modulatedData);
-    // Now 'data' should be defined, and you can use it as needed
     const firstTabContent = document.getElementById("companyTabData");
     console.log(`data - ${JSON.stringify(data)}`);
-    // firstTabContent.innerHTML = `<p>${JSON.stringify(finalTable)}</p>`; // Adjust as needed to display your data
     document.getElementById("resultData").style.display = "flex";
     document.getElementById("companyTabData").style.display = "flex";
-    // document.getElementById("stockSummaryTabData").style.display = "flex";
-    // document.getElementById("chartsTabData").style.display = "flex";
-    // document.getElementById("newsTabData").style.display = "flex";
-    activateTab(0); // Assuming you have an activateTab function to set the active tab
+    activateTab(0);
   } catch (error) {
     console.log("error in stockInfo - ", error);
   }
@@ -235,9 +134,6 @@ async function fetchDataForTabs(stockTickerSymbol) {
       dataObject = resultForEveryTab;
       let displayFunction = displayDataFunctionMap[apiName];
       displayFunction && displayFunction(dataObject);
-      activateTab(
-        document.querySelector('.tabButton[data-tab-target="companyTabData"]')
-      );
       console.log(
         `apiName - ${apiName}, apiResult - ${JSON.stringify(dataObject)}`
       );
@@ -293,7 +189,45 @@ function modulateStockSummary(response) {
   return stock_summary;
 }
 
-function modulateNews() {}
+function modulateNews(response) {
+  const orderOfKeys = ["image", "headline", "datetime", "url"];
+  const attribute_mapping_news = {
+    image: "image",
+    headline: "title",
+    datetime: "date",
+    url: "link_to_post",
+  };
+
+  const validNewsItems = [];
+  let mappedNewsItems = [];
+
+  // Collect up to 5 valid news items
+  for (let item of response) {
+    const isValidItem = orderOfKeys.every(
+      (key) => item.hasOwnProperty(key) && item[key]
+    );
+    if (isValidItem) {
+      validNewsItems.push(item);
+      if (validNewsItems.length === 5) {
+        break;
+      }
+    }
+  }
+
+  // Map the attributes for each valid news item
+  for (let item of validNewsItems) {
+    let news = {};
+    for (let attribute in item) {
+      if (attribute in attribute_mapping_news) {
+        news[attribute_mapping_news[attribute]] = item[attribute];
+      }
+    }
+    mappedNewsItems.push(news);
+  }
+
+  console.log(mappedNewsItems);
+  return mappedNewsItems;
+}
 
 function modulateCharts() {}
 
@@ -337,27 +271,12 @@ function activateTab(tabIndex) {
       document.getElementById(tabDataId).style.display = "block";
       //   tab.CDATA_SECTION_NODE.
     } else {
-      tab.classList.remove("active");
       let tabDataId = tab.getAttribute("data-tab-target");
       document.getElementById(tabDataId).style.display = "none";
     }
   });
 }
 
-function activateTab(tabElement) {
-  // Clear all active states and hide content
-  clearActiveTabsAndHideContent();
-
-  // Add 'active' class to the clicked tab
-  tabElement.classList.add("active");
-
-  // Get the corresponding content ID and display it
-  const tabDataId = tabElement.getAttribute("data-tab-target");
-  const tabContent = document.getElementById(tabDataId);
-  if (tabContent) {
-    tabContent.style.display = "block";
-  }
-}
 
 function deactivateAllTabs() {
   const allTabs = document.querySelectorAll("#tabsList .tabButton");
@@ -422,7 +341,7 @@ function displayStockSummaryData(stockSummaryData) {
   const stockTickerSymbol = document
     .getElementById("searchText")
     .value.toUpperCase();
-  // Define the order of the keys as they should appear in the table
+  // the order of the keys as they should appear in the table
   const orderOfKeys = [
     "trading_day",
     "previous_closing_price",
@@ -433,32 +352,21 @@ function displayStockSummaryData(stockSummaryData) {
     "change_percent",
   ];
 
-  // Create a table element
   const table = document.createElement("table");
-  table.classList.add("stockSummary-data-table"); // Add your CSS class for styling
+  table.classList.add("stockSummary-data-table");
 
-  // Iterate over the orderOfKeys array to maintain the order of content
+  // maintain the order of content
   orderOfKeys.forEach((key) => {
     const row = table.insertRow();
     const keyCell = document.createElement("th");
     const valueCell = document.createElement("td");
 
-    // Set the text content for keyCell based on the mapping
     keyCell.textContent = key
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" "); // Convert snake_case to Title Case
 
-    // Check if it's the logo to create an image element instead
-    //   if (key === "company_logo" && companyData[key]) {
-    //     const img = document.createElement("img");
-    //     img.src = companyData[key];
-    //     img.alt = "Company Logo";
-    //     // You may want to add styling or classes to size the image appropriately
-    //     valueCell.appendChild(img);
-    //   } else {
     valueCell.textContent = stockSummaryData[key];
-    //   }
 
     row.appendChild(keyCell);
     row.appendChild(valueCell);
@@ -466,10 +374,69 @@ function displayStockSummaryData(stockSummaryData) {
 
   // Append the table to the "companyTabData" div
   const stockSummaryTabContent = document.getElementById("stockSummaryTabData");
-  stockSummaryTabContent.innerHTML = ""; // Clear any existing content
+  stockSummaryTabContent.innerHTML = "";
   stockSummaryTabContent.appendChild(table);
 }
 
-function displayNewsData() {}
+function displayNewsData(newsData) {
+  const newsTable = document.createElement("table");
+  newsTable.classList.add("news-table");
+
+  // Iterate over the newsData array
+  newsData.forEach((newsItem) => {
+    const newsRow = document.createElement("tr"); // Table row for each news item
+
+    // Create the image element in its own table cell
+    const imgCell = document.createElement("td");
+    imgCell.classList.add("news-image-cell");
+    const img = document.createElement("img");
+    img.src = newsItem.image;
+    img.alt = newsItem.title;
+    img.classList.add("news-image");
+    imgCell.appendChild(img);
+    newsRow.appendChild(imgCell); // Append image cell to the row
+
+    // Create a cell for the text content
+    const textCell = document.createElement("td");
+    textCell.classList.add("news-text-cell");
+
+    // Create the title element
+    const title = document.createElement("h3");
+    title.textContent = newsItem.title;
+    title.classList.add("news-title");
+    textCell.appendChild(title);
+
+    // Create the date element
+    const date = document.createElement("p");
+    const dateObject = new Date(newsItem.date * 1000); // assuming the date is a timestamp
+    date.textContent = dateObject.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    date.classList.add("news-date");
+    textCell.appendChild(date);
+
+    // Create the link element
+    const link = document.createElement("a");
+    link.href = newsItem.link_to_post;
+    link.textContent = "See Original Post";
+    link.classList.add("news-link");
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    textCell.appendChild(link);
+
+    // Append text cell to the row
+    newsRow.appendChild(textCell);
+
+    // Append the newsRow to the newsTable
+    newsTable.appendChild(newsRow);
+  });
+
+  // Assuming you have a container in your HTML with the ID 'newsTabData'
+  const newsTabData = document.getElementById("newsTabData");
+  newsTabData.innerHTML = ""; // Clear existing content
+  newsTabData.appendChild(newsTable);
+}
 
 function displayChartsData() {}
