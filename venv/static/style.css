@@ -28,33 +28,6 @@ body {
   transform: translateY(-50%);
 }
 
-/* #search-bar {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 2% 4%;
-  width: 100%;
-  outline: none;
-  font-size: 1.6vw;
-  display: flex;
-} */
-
-/* #search-bar input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 1.6vw;
-} */
-/* 
-#search-icon {
-  cursor: pointer;
-  margin-right: 1%;
-} */
-/* 
-#search-bar-buttons {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-} */
 
 #clear-button,
 #search-button {
@@ -207,4 +180,58 @@ input[type="search"]::-webkit-search-cancel-button {
   height: 70%;
   width: 100%;
   border: 1px solid green;
+}
+
+#tabsList {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  background-color: lightgray;
+  width: 80%;
+  height: 50px;
+  font-family: sans-serif;
+  align-content: center;
+}
+
+
+#resultData {
+  display: none;
+  align-items: center;
+  padding: 0;
+  background-color: lightgray;
+  width: 80%;
+  height: 50px;
+  font-family: sans-serif;
+  align-content: center;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tabButton {
+  padding-right: 3%;
+  padding-left: 3%;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.tabButton:hover {
+  background-color: grey;
+}
+
+.tabButton.active {
+  background-color: grey;
+}
+
+.tabButton a {
+  display: flex;
+  text-decoration: none;
+  width: 100%;
+  height: 100%;
+  align-items: center;
 }
