@@ -16,33 +16,9 @@
 </style>
 
 <body>
-    <!-- Background SVG -->
     <img id="background-svg" src="images/back.svg" viewBox="0 0 1920 1080">
-    <!-- Include your SVG content here -->
     </img>
 
-    <!-- Search Bar -->
-    <!-- <div id="search-container">
-            <div id="search-bar">
-                <form>
-                    
-                <button id="search-button" type="submit">
-                    <svg id="search-icon" aria-hidden="true" focusable="true" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        <path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path>
-                    </svg>
-                </button>
-                <input type="text" name="text" placeholder="Search..." required>
-                <div id="button-divider"></div>
-                <button id="search-button">
-                    <img id="search-icon" src="images/times-solid.svg" alt="Search Icon">
-                </button>
-            </form>
-            </div>
-            <div id="search-bar-buttons">
-            </div>
-        </div> -->
-
-    <!-- Search Bar -->
     <h2 class="header">Stock Search</h2>
     <div class="search-container-root">
         <form class="form-css" id="searchInput">
@@ -75,64 +51,89 @@
             </div>
         </form>
     </div>
-    <div id="resultData"></div>
+    <div id="resultData">
+        <ul id="tabsList">
+            <li active class="tabButton companyTab" data-tab-target="companyTabData">
+                <a onclick="getDataForCompanyTab()">Company</a>
+            </li>
+            <li class="tabButton stockSummaryTab" data-tab-target="stockSummaryTabData">
+                <a onclick="getDataForStockSummaryTab()">Stock Summary</a>
+            </li>
+            <li class="tabButton chartsTab" data-tab-target="chartsTabData">
+                <a onclick="getDataForChartsTab()">Charts</a>
+            </li>
+            <li class="tabButton newsTab" data-tab-target="newsTabData">
+                <a onclick="getDataForNewsTab()">Latest News</a>
+            </li>
+        </ul>
+    </div>
+    <div id="companyTabData" class="companyTabData" data-tab-content>
+    </div>
+    <div id="stockSummaryTabData" class="stockSummaryTabData" data-tab-content>
+    </div>
+    <div id="chartsTabData" class="chartsTabData" data-tab-content>
+    </div>
+    <div id="newsTabData" class="newsTabData" data-tab-content>
+    </div>
 
-    <script>
-
-        const company_tab_name = "Company";
-        const summary_tab_name = "Stock Summary";
-        const charts_tab_name = "Charts";
-        const news_tab_name = "Latest News";
-        let isDataRetrieved = false;
+    <script src="mainScript.js"></script>
 
 
-        function getStockData() {
-            document.getElementById('searchInput').addEventListener('submit', function (ev) {
-                event.preventDefault();
+    const company_tab_name = "Company";
+    const summary_tab_name = "Stock Summary";
+    const charts_tab_name = "Charts";
+    const news_tab_name = "Latest News";
+    let isDataRetrieved = false;
 
-                const stockTickerSymbol = document.getElementById('searchText').value;
 
-                if (!isDataRetrieved) {
-                    fetch(`/api?stockTickerSymbol=${encodeURIComponent(stockTickerSymbol)}`)
-                        .then((response) => response.json())  // Return the promise
-                        .then((data) => {
-                            console.log(data);
-                            const displayContainer = document.getElementById('resultData');
+    function getStockData() {
+    document.getElementById('searchInput').addEventListener('submit', function (ev) {
+    event.preventDefault();
 
-                            const stockDataTabs = document.createElement('div');
-                            stockDataTabs.id = 'stockDataTabs';
+    const stockTickerSymbol = document.getElementById('searchText').value;
 
-                            const stockDataTabNames = [company_tab_name, summary_tab_name, charts_tab_name, news_tab_name];
-                            stockDataTabNames.forEach((stockDataTabName, index) => {
-                                const tabElement = document.createElement('div');
-                                tabElement.textContent = stockDataTabName;
-                                tabElement.className = 'stockDataTab';
-                                tabElement.addEventListener('click', () => {
-                                    loadContentForTab(index, data);
+    if (!isDataRetrieved) {
+    fetch(`/api?stockTickerSymbol=${encodeURIComponent(stockTickerSymbol)}`)
+    .then((response) => response.json()) // Return the promise
+    .then((data) => {
+    console.log(data);
+    const displayContainer = document.getElementById('resultData');
 
-                                    stockDataTabs.appendChild(tabElement);
-                                })
-                            })
+    const stockDataTabs = document.createElement('div');
+    stockDataTabs.id = 'stockDataTabs';
 
-                            displayContainer.innerHTML = `<p>${JSON.stringify(data)}<p>`;
-                            isDataRetrieved = true;
-                        }).catch((error) => {
-                            console.error('Error in flask API: ', error);
-                            document.getElementById("resultData").innerText = `Error fetching stock details: ${error}`;
+    const stockDataTabNames = [company_tab_name, summary_tab_name, charts_tab_name, news_tab_name];
+    stockDataTabNames.forEach((stockDataTabName, index) => {
+    const tabElement = document.createElement('div');
+    tabElement.textContent = stockDataTabName;
+    tabElement.className = 'stockDataTab';
+    tabElement.addEventListener('click', () => {
+    loadContentForTab(index, data);
 
-                        })
-                }
+    stockDataTabs.appendChild(tabElement);
+    })
+    })
 
-            });
+    displayContainer.innerHTML = `<p>${JSON.stringify(data)}
+    <p>`;
+        isDataRetrieved = true;
+        }).catch((error) => {
+        console.error('Error in flask API: ', error);
+        document.getElementById("resultData").innerText = `Error fetching stock details: ${error}`;
+
+        })
+        }
+
+        });
         }
 
         function clearSearchInput() {
-            // document.getElementById('clearButton').value = '';
-            isDataRetrieved = false;
-            document.getElementById('resultData').innerHTML = '';
+        // document.getElementById('clearButton').value = '';
+        isDataRetrieved = false;
+        document.getElementById('resultData').innerHTML = '';
         }
 
-    </script>
+        </script> -->
 </body>
 
 </html>
