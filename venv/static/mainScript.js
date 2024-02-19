@@ -93,12 +93,11 @@ async function fetchStockInfo(stockTickerSymbol) {
 
     const modulatedData = modulateCompanyData(data);
     displayCompanyData(modulatedData);
-    console.log(`data - ${JSON.stringify(data)}`);
     document.getElementById("resultData").style.display = "flex";
     document.getElementById("companyTabData").style.display = "flex";
     activateTab(0);
   } catch (error) {
-    console.log("error in stockInfo - ", error);
+    //console.log("error in stockInfo - ", error);
   }
 }
 
@@ -136,12 +135,9 @@ async function fetchDataForTabs(stockTickerSymbol) {
       dataObject = resultForEveryTab;
       let displayFunction = displayDataFunctionMap[apiName];
       displayFunction && displayFunction(dataObject);
-      console.log(
-        `apiName - ${apiName}, apiResult - ${JSON.stringify(dataObject)}`
-      );
     });
   } catch (error) {
-    console.log(`error in fetchDataForAllTabs - ${error}`);
+    //console.log(`error in fetchDataForAllTabs, - ${error}`);
   }
 }
 
@@ -152,7 +148,7 @@ function modulateCompanyData(response) {
       company_data[attribute_mapping_company[attribute]] = response[attribute];
     }
   }
-  console.log(company_data);
+  //console.log(company_data);
   return company_data;
 }
 
@@ -165,7 +161,7 @@ function modulateStockSummary(response) {
         response[attribute];
     }
   }
-  console.log(stock_summary);
+  //console.log(stock_summary);
   return stock_summary;
 }
 
@@ -205,7 +201,7 @@ function modulateNews(response) {
     mappedNewsItems.push(news);
   }
 
-  console.log(mappedNewsItems);
+  //console.log(mappedNewsItems);
   return mappedNewsItems;
 }
 
@@ -439,30 +435,66 @@ function highChartsClosePrice(data) {
   const stockTickerSymbol = document
     .getElementById("searchText")
     .value.toUpperCase();
-  if (typeof HighCharts !== undefined) {
-    return Highcharts.stockChart("chartsTabData", {
+  if (typeof Highcharts !== "undefined") {
+    Highcharts.stockChart("chartsTabData", {
+      chart: {
+        alignTicks: false, // This allows the yAxes to have independent scales
+      },
       rangeSelector: {
         selected: 1,
       },
-
       title: {
         text: `${stockTickerSymbol} Stock Price`,
       },
-
-      navigator: {
-        series: {
-          accessibility: {
-            exposeAsGroupOnly: true,
+      yAxis: [
+        {
+          title: {
+            text: "Stock Price",
+            // align: "high",
+            x: -15,
           },
+          labels: {
+            align: "left",
+            x: -27,
+          },
+          //   height: "60%",
+          resize: {
+            enabled: true,
+          },
+          lineWidth: 0,
+          opposite: false,
+          min: 180,
+          max: 280,
+          tickInterval: 20,
         },
+        {
+          title: {
+            text: "Volume",
+            // align: "high",
+            x: 15,
+          },
+          labels: {
+            align: "right",
+            x: +27,
+          },
+          //   top: "65%",
+          //   height: "35%",
+          offset: 0,
+          lineWidth: 0,
+          opposite: true,
+          min: 0,
+          max: 400000000,
+          tickInterval: 80000000,
+        },
+      ],
+      tooltip: {
+        split: true,
       },
-
       series: [
         {
           name: `${stockTickerSymbol} Stock Price`,
           data: data.closePriceData,
           type: "area",
-          threshold: null,
           tooltip: {
             valueDecimals: 2,
           },
@@ -483,16 +515,27 @@ function highChartsClosePrice(data) {
               ],
             ],
           },
+          yAxis: 0, // Stock price is associated with the first yAxis
+        },
+        {
+          name: "Volume",
+          type: "column",
+          data: data.volumeData,
+          yAxis: 1, // Volume is associated with the second yAxis
+          tooltip: {
+            valueDecimals: 0,
+          },
+          color: "black",
         },
       ],
     });
   } else {
-    console.log("high chart not loaded");
+    //console.log("Highcharts is not loaded");
   }
 }
 
 function displayChartsData(chartsData) {
   const chartsTabData = document.getElementById("chartsTabData");
   chartsTabData.innerHTML = "";
-  chartsTabData.appendChild(highChartsClosePrice(chartsData));
+  highChartsClosePrice(chartsData);
 }
