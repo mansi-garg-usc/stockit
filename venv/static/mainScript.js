@@ -94,11 +94,25 @@ async function fetchStockInfo(stockTickerSymbol) {
     }
     const data = await response.json();
 
+    // if (data.length === undefined) {
+    //   const errorDiv = document.createElement("div");
+    //   errorDiv.style.display = "block";
+    //   errorDiv.style.backgroundColor = "grey";
+    //   errorDiv.style.height = "20px";
+    //   errorDiv.style.paddingTop = "1.5%";
+    //   errorDiv.innerHTML = `<p>Error: No record has been found, please enter a valid symbol</p>`;
+    //   //   errorDiv.style.border = "1px solid";
+    //   const errorDivContainer = document.getElementById("error");
+    //   //   errorDivContainer.style.display = "block";
+    //   errorDivContainer.appendChild(errorDiv);
+    //   return;
+    // } else {
     const modulatedData = modulateCompanyData(data);
     displayCompanyData(modulatedData);
     document.getElementById("resultData").style.display = "flex";
     document.getElementById("companyTabData").style.display = "flex";
     activateTab(0);
+    // }
   } catch (error) {
     //console.log("error in stockInfo - ", error);
   }
@@ -121,15 +135,20 @@ async function fetchDataForTabs(stockTickerSymbol) {
   };
 
   try {
-    const promises = Object.entries(endpoints).map(
-      ([apiName, apiEndpoint]) =>
-        fetch(apiEndpoint)
-          .then((response) => response.json())
-          .then((data) => ({ apiName, data })) // Ensure the promise resolves to an object with apiName and data
+    const promises = Object.entries(endpoints).map(([apiName, apiEndpoint]) =>
+      fetch(apiEndpoint)
+        .then((response) => response.json())
+        .then((data) => ({ apiName, data }))
     );
 
     const dataForAllTabs = await Promise.all(promises);
 
+    // let companyNewsData = dataForAllTabs.find(
+    //   (dataElements) => dataElements.apiName === "companyNews"
+    // );
+    // if (companyNewsData?.data.length === 0) {
+    //   return;
+    // } else {
     dataForAllTabs.forEach(({ apiName, data }) => {
       const dataModulationFunction = dataModulationFunctionMap[apiName];
       const resultForEveryTab =
@@ -139,6 +158,7 @@ async function fetchDataForTabs(stockTickerSymbol) {
       let displayFunction = displayDataFunctionMap[apiName];
       displayFunction && displayFunction(dataObject);
     });
+    // }
   } catch (error) {
     //console.log(`error in fetchDataForAllTabs, - ${error}`);
   }
@@ -256,6 +276,8 @@ function clearSearchInput() {
   document.getElementById("searchText").value = "";
   clearActiveTabsAndHideContent();
   isDataRetrieved = false;
+  document.getElementById("error").innerHTML = "";
+  document.getElementById("error").style.display = "none";
   document.getElementById("resultData").style.display = "none";
   document.getElementById("companyTabData").style.display = "none";
   document.getElementById("stockSummaryTabData").style.display = "none";
@@ -303,7 +325,6 @@ function deactivateAllTabs() {
 }
 
 function displayCompanyData(companyData) {
-  // Define the order of the keys as they should appear in the table
   const orderOfKeys = [
     "company_logo",
     "company_name",
@@ -313,18 +334,18 @@ function displayCompanyData(companyData) {
     "category",
   ];
 
-  // Get the container div
   const containerDiv = document.getElementById("companyTabData");
   containerDiv.innerHTML = "";
 
-  // Create a table element
   const table = document.createElement("table");
   table.classList.add("company-data-table");
   table.style.borderCollapse = "collapse";
   table.style.paddingTop = "3%";
   table.style.margin = "auto";
-  table.style.height = "90%";
-  table.style.width = "50%";
+  table.style.height = "75%";
+  table.style.width = "46%";
+
+  const fragmentContainer = document.createDocumentFragment();
 
   if (companyData["company_logo"]) {
     const logoImg = document.createElement("img");
@@ -333,6 +354,7 @@ function displayCompanyData(companyData) {
     logoImg.style.margin = "auto";
     logoImg.style.height = "85px";
     logoImg.style.width = "auto";
+    logoImg.style.paddingBottom = "2%";
     containerDiv.appendChild(logoImg);
   }
   orderOfKeys.forEach((key) => {
@@ -349,16 +371,21 @@ function displayCompanyData(companyData) {
               .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ");
       valueCell.textContent = companyData[key];
+      keyCell.style.textAlign = "right";
+      keyCell.style.width = "48%";
+      valueCell.style.textAlign = "left";
+      valueCell.style.paddingLeft = "2%";
       keyCell.style.borderTop = "1px solid #ccc";
       valueCell.style.borderTop = "1px solid #ccc";
       keyCell.style.borderBottom = "1px solid #ccc";
       valueCell.style.borderBottom = "1px solid #ccc";
       row.appendChild(keyCell);
       row.appendChild(valueCell);
+      fragmentContainer.appendChild(row);
     }
   });
 
-  // Append the table to the "companyTabData" div
+  table.appendChild(fragmentContainer);
   containerDiv.appendChild(table);
 }
 
@@ -366,8 +393,8 @@ function displayStockSummaryData(stockSummaryData) {
   const stockTickerSymbol = document
     .getElementById("searchText")
     .value.toUpperCase();
-  // the order of the keys as they should appear in the table
   const orderOfKeys = [
+    "stock_ticker_symbol",
     "trading_day",
     "previous_closing_price",
     "opening_price",
@@ -380,17 +407,12 @@ function displayStockSummaryData(stockSummaryData) {
   const table = document.createElement("table");
   table.classList.add("stockSummary-data-table");
   table.style.borderCollapse = "collapse";
-  const fragment = document.createDocumentFragment();
+  table.style.paddingTop = "3%";
+  table.style.margin = "auto";
+  table.style.height = "75%";
+  table.style.width = "100%";
+  const fragmentContainer = document.createDocumentFragment();
 
-  const row = table.insertRow();
-  const keyCell = document.createElement("th");
-  const valueCell = document.createElement("td");
-  keyCell.textContent = "Stock Ticker Symbol";
-  valueCell.textContent = stockTickerSymbol;
-  row.appendChild(keyCell);
-  row.appendChild(valueCell);
-
-  // maintain the order of content
   orderOfKeys.forEach((key) => {
     const row = table.insertRow();
     const keyCell = document.createElement("th");
@@ -400,15 +422,16 @@ function displayStockSummaryData(stockSummaryData) {
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
-
-    if (key === "change" || key === "change_percent") {
+    if (key === "stock_ticker_symbol") {
+      valueCell.textContent = stockTickerSymbol;
+    } else if (key === "change" || key === "change_percent") {
       const value = stockSummaryData[key];
       const textNode = document.createTextNode(value);
       valueCell.appendChild(textNode);
 
       const arrowImg = document.createElement("img");
       arrowImg.style.marginLeft = "5px";
-      arrowImg.style.width = "4%";
+      arrowImg.style.width = "5%";
 
       if (value < 0) {
         arrowImg.src = "images/RedArrowDown.png";
@@ -422,7 +445,10 @@ function displayStockSummaryData(stockSummaryData) {
     } else {
       valueCell.textContent = stockSummaryData[key];
     }
-
+    keyCell.style.textAlign = "right";
+    keyCell.style.width = "48%";
+    valueCell.style.textAlign = "left";
+    valueCell.style.paddingLeft = "2%";
     keyCell.style.borderTop = "1px solid #ccc";
     valueCell.style.borderTop = "1px solid #ccc";
     keyCell.style.borderBottom = "1px solid #ccc";
@@ -431,15 +457,13 @@ function displayStockSummaryData(stockSummaryData) {
     row.appendChild(keyCell);
     row.appendChild(valueCell);
 
-    fragment.appendChild(row);
+    fragmentContainer.appendChild(row);
   });
 
-  table.appendChild(fragment);
+  table.appendChild(fragmentContainer);
 
-  // Append the table to the "companyTabData" div
   const stockSummaryTabContent = document.getElementById("stockSummaryTabData");
   stockSummaryTabContent.innerHTML = "";
-  //   stockSummaryTabContent.appendChild(recommendationTrendsElement);
   stockSummaryTabContent.appendChild(table);
 }
 
