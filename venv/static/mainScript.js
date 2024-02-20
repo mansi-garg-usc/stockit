@@ -6,16 +6,19 @@ let isDataRetrieved = false;
 let modulatedStockSummaryData;
 let modulatedChartsData;
 let modulatedNewsData;
+//let recommendationTrendsElement;
 const dataModulationFunctionMap = {
   stockSummary: modulateStockSummary,
   companyNews: modulateNews,
   highCharts: modulateCharts,
+  //recommendationTrends: modulateRecommendationTrends,
 };
 
 const displayDataFunctionMap = {
   stockSummary: displayStockSummaryData,
   companyNews: displayNewsData,
   highCharts: displayChartsData,
+  //recommendationTrends: displayRecommendationTrendsData,
 };
 
 const dataObjectMap = {
@@ -38,7 +41,7 @@ const attribute_mapping_stock_summary = {
   pc: "previous_closing_price",
   o: "opening_price",
   h: "high_price",
-  i: "low_price",
+  l: "low_price",
   d: "change",
   dp: "change_percent",
 };
@@ -103,13 +106,13 @@ async function fetchStockInfo(stockTickerSymbol) {
 
 async function fetchDataForTabs(stockTickerSymbol) {
   const endpoints = {
-    stockSummary: `/stockSummary?stockTickerSymbol=${encodeURIComponent(
+    companyNews: `/companyNews?stockTickerSymbol=${encodeURIComponent(
       stockTickerSymbol
     )}`,
     stockrecommendationTrends: `/stockrecommendationTrends?stockTickerSymbol=${encodeURIComponent(
       stockTickerSymbol
     )}`,
-    companyNews: `/companyNews?stockTickerSymbol=${encodeURIComponent(
+    stockSummary: `/stockSummary?stockTickerSymbol=${encodeURIComponent(
       stockTickerSymbol
     )}`,
     highCharts: `/highCharts?stockTickerSymbol=${encodeURIComponent(
@@ -161,9 +164,30 @@ function modulateStockSummary(response) {
         response[attribute];
     }
   }
-  //console.log(stock_summary);
+
+  const unixTimeStamp = stock_summary["trading_day"];
+  const date = new Date(unixTimeStamp);
+  const day = date.getDate();
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
+  stock_summary["trading_day"] = `${day} ${month}, ${year}`;
   return stock_summary;
 }
+
+// function modulateRecommendationTrends(response) {
+//   function parseDate(dateString) {
+//     return new Date(dateString);
+//   }
+
+//   // Find the latest period data object
+//   const latestDateData = response.reduce((latest, current) => {
+//     return parseDate(latest.period) > parseDate(current.period)
+//       ? latest
+//       : current;
+//   });
+
+//   return latestDateData;
+// }
 
 function modulateNews(response) {
   const orderOfKeys = ["image", "headline", "datetime", "url"];
@@ -278,10 +302,6 @@ function deactivateAllTabs() {
   });
 }
 
-// function displayCompanyData(data) {
-
-// }
-
 function displayCompanyData(companyData) {
   // Define the order of the keys as they should appear in the table
   const orderOfKeys = [
@@ -293,41 +313,53 @@ function displayCompanyData(companyData) {
     "category",
   ];
 
+  // Get the container div
+  const containerDiv = document.getElementById("companyTabData");
+  containerDiv.innerHTML = "";
+
   // Create a table element
   const table = document.createElement("table");
-  table.classList.add("company-data-table"); // Add your CSS class for styling
+  table.classList.add("company-data-table");
+  table.style.borderCollapse = "collapse";
+  table.style.paddingTop = "3%";
+  table.style.margin = "auto";
+  table.style.height = "90%";
+  table.style.width = "50%";
 
-  // Iterate over the orderOfKeys array to maintain the order of content
+  if (companyData["company_logo"]) {
+    const logoImg = document.createElement("img");
+    logoImg.src = companyData["company_logo"];
+    logoImg.style.display = "block";
+    logoImg.style.margin = "auto";
+    logoImg.style.height = "85px";
+    logoImg.style.width = "auto";
+    containerDiv.appendChild(logoImg);
+  }
   orderOfKeys.forEach((key) => {
-    const row = table.insertRow();
-    const keyCell = document.createElement("th");
-    const valueCell = document.createElement("td");
+    if (key !== "company_logo") {
+      const row = table.insertRow();
+      const keyCell = document.createElement("th");
+      const valueCell = document.createElement("td");
 
-    // Set the text content for keyCell based on the mapping
-    keyCell.textContent = key
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" "); // Convert snake_case to Title Case
-
-    // Check if it's the logo to create an image element instead
-    if (key === "company_logo" && companyData[key]) {
-      const img = document.createElement("img");
-      img.src = companyData[key];
-      img.alt = "Company Logo";
-      // You may want to add styling or classes to size the image appropriately
-      valueCell.appendChild(img);
-    } else {
+      keyCell.textContent =
+        key === "company_start_date"
+          ? "Company IPO Date"
+          : key
+              .split("_")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ");
       valueCell.textContent = companyData[key];
+      keyCell.style.borderTop = "1px solid #ccc";
+      valueCell.style.borderTop = "1px solid #ccc";
+      keyCell.style.borderBottom = "1px solid #ccc";
+      valueCell.style.borderBottom = "1px solid #ccc";
+      row.appendChild(keyCell);
+      row.appendChild(valueCell);
     }
-
-    row.appendChild(keyCell);
-    row.appendChild(valueCell);
   });
 
   // Append the table to the "companyTabData" div
-  const companyTabContent = document.getElementById("companyTabData");
-  companyTabContent.innerHTML = ""; // Clear any existing content
-  companyTabContent.appendChild(table);
+  containerDiv.appendChild(table);
 }
 
 function displayStockSummaryData(stockSummaryData) {
@@ -347,6 +379,16 @@ function displayStockSummaryData(stockSummaryData) {
 
   const table = document.createElement("table");
   table.classList.add("stockSummary-data-table");
+  table.style.borderCollapse = "collapse";
+  const fragment = document.createDocumentFragment();
+
+  const row = table.insertRow();
+  const keyCell = document.createElement("th");
+  const valueCell = document.createElement("td");
+  keyCell.textContent = "Stock Ticker Symbol";
+  valueCell.textContent = stockTickerSymbol;
+  row.appendChild(keyCell);
+  row.appendChild(valueCell);
 
   // maintain the order of content
   orderOfKeys.forEach((key) => {
@@ -357,19 +399,88 @@ function displayStockSummaryData(stockSummaryData) {
     keyCell.textContent = key
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" "); // Convert snake_case to Title Case
+      .join(" ");
 
-    valueCell.textContent = stockSummaryData[key];
+    if (key === "change" || key === "change_percent") {
+      const value = stockSummaryData[key];
+      const textNode = document.createTextNode(value);
+      valueCell.appendChild(textNode);
+
+      const arrowImg = document.createElement("img");
+      arrowImg.style.marginLeft = "5px";
+      arrowImg.style.width = "4%";
+
+      if (value < 0) {
+        arrowImg.src = "images/RedArrowDown.png";
+      } else if (value > 0) {
+        arrowImg.src = "images/GreenArrowUp.png";
+      }
+
+      if (value !== 0) {
+        valueCell.appendChild(arrowImg);
+      }
+    } else {
+      valueCell.textContent = stockSummaryData[key];
+    }
+
+    keyCell.style.borderTop = "1px solid #ccc";
+    valueCell.style.borderTop = "1px solid #ccc";
+    keyCell.style.borderBottom = "1px solid #ccc";
+    valueCell.style.borderBottom = "1px solid #ccc";
 
     row.appendChild(keyCell);
     row.appendChild(valueCell);
+
+    fragment.appendChild(row);
   });
+
+  table.appendChild(fragment);
 
   // Append the table to the "companyTabData" div
   const stockSummaryTabContent = document.getElementById("stockSummaryTabData");
   stockSummaryTabContent.innerHTML = "";
+  //   stockSummaryTabContent.appendChild(recommendationTrendsElement);
   stockSummaryTabContent.appendChild(table);
 }
+
+// function displayRecommendationTrendsData(recommendationTrendsData) {
+//   //   const widgetContainer = document.getElementById("recommendationTrends");
+//   //   widgetContainer.innerHTML = ""; // Clear the container
+
+//   // Create elements for each recommendation category
+//   const categories = ["strongSell", "sell", "hold", "buy", "strongBuy"];
+//   const categoryNames = ["Strong Sell", "Sell", "Hold", "Buy", "Strong Buy"];
+//   const categoryColors = [
+//     "#d9534f",
+//     "#f0ad4e",
+//     "#5bc0de",
+//     "#5cb85c",
+//     "#5cb85c",
+//   ];
+
+//   categories.forEach((category, index) => {
+//     // Create the container for each trend category
+//     const trendDiv = document.createElement("div");
+//     trendDiv.classList.add("trend");
+//     trendDiv.style.backgroundColor = categoryColors[index]; // Set the background color
+
+//     // Create the label
+//     const labelSpan = document.createElement("span");
+//     labelSpan.textContent = categoryNames[index];
+//     labelSpan.style.marginRight = "5px";
+
+//     // Create the value container
+//     const valueSpan = document.createElement("span");
+//     valueSpan.textContent = recommendationTrendsData[category];
+
+//     // Append the label and value to the trend container
+//     trendDiv.appendChild(labelSpan);
+//     trendDiv.appendChild(valueSpan);
+
+//     // Append the trend container to the widget container
+//     recommendationTrendsElement = trendDiv;
+//   });
+// }
 
 function displayNewsData(newsData) {
   const newsTable = document.createElement("table");
@@ -386,6 +497,8 @@ function displayNewsData(newsData) {
     img.src = newsItem.image;
     img.alt = newsItem.title;
     img.classList.add("news-image");
+    img.style.width = "95px";
+    img.style.height = "95px";
     imgCell.appendChild(img);
     newsRow.appendChild(imgCell); // Append image cell to the row
 
@@ -397,6 +510,7 @@ function displayNewsData(newsData) {
     const title = document.createElement("h3");
     title.textContent = newsItem.title;
     title.classList.add("news-title");
+    title.style.margin = "0";
     textCell.appendChild(title);
 
     // Create the date element
@@ -408,6 +522,7 @@ function displayNewsData(newsData) {
       day: "numeric",
     });
     date.classList.add("news-date");
+    date.style.margin = "0";
     textCell.appendChild(date);
 
     // Create the link element
@@ -417,6 +532,7 @@ function displayNewsData(newsData) {
     link.classList.add("news-link");
     link.target = "_blank";
     link.rel = "noopener noreferrer";
+    link.style.margin = "0";
     textCell.appendChild(link);
 
     // Append text cell to the row
@@ -438,10 +554,42 @@ function highChartsClosePrice(data) {
   if (typeof Highcharts !== "undefined") {
     Highcharts.stockChart("chartsTabData", {
       chart: {
-        alignTicks: false, // This allows the yAxes to have independent scales
+        height: "500px",
+      },
+      subtitle: {
+        text: '<a href="https://polygon.io/" target="_blank_">Source: Polygon.io</a>',
+        useHTML: true,
       },
       rangeSelector: {
-        selected: 1,
+        buttons: [
+          {
+            type: "day",
+            count: 7,
+            text: "7d",
+          },
+          {
+            type: "day",
+            count: 15,
+            text: "15d",
+          },
+          {
+            type: "month",
+            count: 1,
+            text: "1m",
+          },
+          {
+            type: "month",
+            count: 3,
+            text: "3m",
+          },
+          {
+            type: "month",
+            count: 6,
+            text: "6m",
+          },
+        ],
+        selected: 4,
+        inputEnabled: false,
       },
       title: {
         text: `${stockTickerSymbol} Stock Price`,
@@ -450,46 +598,21 @@ function highChartsClosePrice(data) {
         {
           title: {
             text: "Stock Price",
-            // align: "high",
-            x: -15,
+            opposite: true,
           },
-          labels: {
-            align: "left",
-            x: -27,
-          },
-          //   height: "60%",
-          resize: {
-            enabled: true,
-          },
-          lineWidth: 0,
           opposite: false,
-          min: 180,
-          max: 280,
-          tickInterval: 20,
         },
         {
           title: {
             text: "Volume",
-            // align: "high",
-            x: 15,
+            opposite: false,
           },
-          labels: {
-            align: "right",
-            x: +27,
-          },
-          //   top: "65%",
-          //   height: "35%",
-          offset: 0,
-          lineWidth: 0,
           opposite: true,
           min: 0,
-          max: 400000000,
-          tickInterval: 80000000,
+          max: 500000000,
+          //   tickInterval: 80000000,
         },
       ],
-      tooltip: {
-        split: true,
-      },
       series: [
         {
           name: `${stockTickerSymbol} Stock Price`,
@@ -515,19 +638,22 @@ function highChartsClosePrice(data) {
               ],
             ],
           },
-          yAxis: 0, // Stock price is associated with the first yAxis
+          yAxis: 0,
+          threshold: null,
         },
         {
           name: "Volume",
           type: "column",
           data: data.volumeData,
-          yAxis: 1, // Volume is associated with the second yAxis
-          tooltip: {
-            valueDecimals: 0,
-          },
+          yAxis: 1,
           color: "black",
         },
       ],
+      plotOptions: {
+        column: {
+          pointWidth: 5,
+        },
+      },
     });
   } else {
     //console.log("Highcharts is not loaded");

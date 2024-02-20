@@ -1,11 +1,24 @@
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  /* overflow: hidden; */
   display: flex;
   flex-direction: column;
   align-items: center;
   align-content: center;
+  font-family: Arial, Helvetica, sans-serif;
+  background-image: url(images/back.svg);
+  background-position: top;
+  background-repeat: no-repeat;
+}
+
+.parent {
+  /* background-image: url(images/back.svg);
+  background-position: top;
+  background-repeat: no-repeat; */
+  background-size: cover;
+  width: 100%;
+  height: 100%;
 }
 
 #background-svg {
@@ -13,8 +26,10 @@ body {
     top: 0;
     left: 0; */
   width: 100vw;
-  height: 100%;
+  height: 180px;
   z-index: -1;
+  /* top: 0;
+  left: 0; */
 }
 
 #search-container {
@@ -27,7 +42,6 @@ body {
   /* margin-top: 50vh; */
   transform: translateY(-50%);
 }
-
 
 #clear-button,
 #search-button {
@@ -48,23 +62,25 @@ body {
   align-items: center;
   align-self: center;
   align-content: center;
+  text-align: center;
+  font-size: 200%;
+  /* margin-top: 50px; */
 }
 
 .search-container-root {
   display: flex;
   flex-direction: row;
   max-width: 300px;
-  width: 40vw;
-  /* height: 2%; */
-  /* width: auto; */
+  width: 40%;
   /* margin: 0 auto; */
-  box-shadow: slategrey;
+  /* box-shadow: 0 4px 6px slategrey; */
+  box-shadow: #708090;
   border-radius: 20px;
   border: 1px solid #5f6368;
   min-height: 44px;
-  /* position: relative;
-    background: ; */
-  border: 1px solid red;
+  align-items: center;
+  background: #fff;
+  position: relative;
 }
 
 .form-css {
@@ -73,31 +89,26 @@ body {
 }
 
 .search-bar-content {
-  /* flex: 1; */
   display: flex;
   flex-direction: row;
-  /* padding: 5px 8px 0 14px; */
-  border: 1px solid red;
 }
 
 .search-button {
   display: flex;
   align-items: center;
-  border: 1px solid maroon;
   height: 46px;
   width: 10%;
 }
 
 .search-icon {
   display: flex;
-  border: 1px solid green;
   width: 100%;
 }
 
 .search-button,
 .search-clear-button,
 .search-icon-inline {
-  background: none; /* Remove background */
+  background: none;
   border: none;
   cursor: pointer;
 }
@@ -110,13 +121,13 @@ body {
   line-height: 20px;
   height: 70%;
   width: 40%;
-  border: 1px solid green;
+  border-left: thin solid #d4d4d4;
 }
 
 .search-clear-button svg {
   width: 100%;
   height: 100%;
-  fill: currentColor; /* Add this line to inherit the text color as the SVG fill */
+  fill: currentColor;
   cursor: pointer;
 }
 
@@ -124,7 +135,6 @@ body {
   line-height: 20px;
   height: 100%;
   width: 100%;
-  border: 1px solid green;
 }
 
 /* .search-bar-content svg {
@@ -139,7 +149,6 @@ body {
   /* flex-direction: r; */
   /* flex-wrap: wrap; */
   /* flex: 1; */
-  border: 1px solid red;
   width: 100%;
 }
 
@@ -152,10 +161,9 @@ body {
   margin: 0;
   border: none;
   color: grey;
-  border: 1px solid red;
   width: 100%;
-  -moz-appearance: none; /* Firefox */
-  -webkit-appearance: none; /* Chrome, Safari, Edge */
+  -moz-appearance: none;
+  -webkit-appearance: none;
   appearance: none;
 }
 
@@ -174,25 +182,23 @@ input[type="search"]::-webkit-search-cancel-button {
   /* flex-direction: row; */
   /* padding-right: 10px; */
   margin: 0 auto;
-  border: 1px solid red;
   /* width: 10%;   */
   line-height: 20px;
   height: 70%;
   width: 100%;
-  border: 1px solid green;
+  /* border: 1px solid green; */
 }
 
 #tabsList {
   display: flex;
-  align-items: center;
+  justify-content: space-around;
+  list-style-type: none;
   padding: 0;
+  margin: 0;
+  width: 70%;
   background-color: lightgray;
-  width: 80%;
   height: 50px;
-  font-family: sans-serif;
-  align-content: center;
 }
-
 
 #resultData {
   display: none;
@@ -203,6 +209,8 @@ input[type="search"]::-webkit-search-cancel-button {
   height: 50px;
   font-family: sans-serif;
   align-content: center;
+  margin-top: 20%;
+  margin-bottom: 3%;
 }
 
 ul {
@@ -212,16 +220,15 @@ ul {
 }
 
 .tabButton {
-  padding-right: 3%;
-  padding-left: 3%;
-  cursor: pointer;
-  height: 100%;
+  flex-grow: 1;
   display: flex;
+  justify-content: center;
   align-items: center;
 }
 
 .tabButton:hover {
   background-color: grey;
+  cursor: pointer;
 }
 
 .tabButton.active {
@@ -229,9 +236,64 @@ ul {
 }
 
 .tabButton a {
-  display: flex;
-  text-decoration: none;
+  display: block;
   width: 100%;
+  height: 60%;
+  padding: 10px 0;
+  text-decoration: none;
+  text-align: center;
+  color: inherit;
+}
+
+#companyTabData {
+  width: 80%;
+  font-size: 0.9rem;
+  height: 240px;
+}
+
+#companyTabData table {
+  padding-top: 3%;
+}
+
+#companyTabData tr {
+  border-bottom: 1px solid #ccc;
+  padding: 8px;
+}
+
+#chartsTabData {
+  width: 80%;
+}
+
+#newsTabData {
+  width: 80%;
+  font-size: 12px;
   height: 100%;
-  align-items: center;
+  overflow-y: auto;
+}
+#newsTabData .news-content {
+  margin-top: 20px;
+}
+
+.news-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.news-table tr {
+  background-color: #f2f2f2;
+}
+
+.news-table td {
+  padding: 8px;
+}
+
+.news-image-cell img {
+  width: 50px;
+  height: auto;
+  display: block;
+}
+
+.news-text-cell {
+  vertical-align: top;
 }

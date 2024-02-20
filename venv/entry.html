@@ -8,6 +8,10 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style.css">
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
 </head>
 <style>
     input:invalid {
@@ -16,9 +20,6 @@
 </style>
 
 <body>
-    <img id="background-svg" src="images/back.svg" viewBox="0 0 1920 1080">
-    </img>
-
     <h2 class="header">Stock Search</h2>
     <div class="search-container-root">
         <form class="form-css" id="searchInput">
@@ -39,9 +40,6 @@
             </div>
             <div id="clear-button" class="search-clear-button-container clear-button">
                 <button class="search-clear-button" onclick="clearSearchInput()" type="reset">
-                    <!-- <img src="images/times-solid.svg" alt="Clear Icon"> -->
-                    <!-- <object type="image/svg+xml" data="images/search-solid.svg"></object>
-                </button> -->
                     <svg focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
                         <path fill="grey"
                             d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z">
@@ -68,72 +66,13 @@
         </ul>
     </div>
     <div id="companyTabData" class="companyTabData" data-tab-content>
+        <div id="recommendationTrends"></div>
     </div>
-    <div id="stockSummaryTabData" class="stockSummaryTabData" data-tab-content>
-    </div>
-    <div id="chartsTabData" class="chartsTabData" data-tab-content>
-    </div>
-    <div id="newsTabData" class="newsTabData" data-tab-content>
-    </div>
+    <div id="stockSummaryTabData" class="stockSummaryTabData" data-tab-content></div>
+    <div id="chartsTabData" class="chartsTabData" data-tab-content></div>
+    <div id="newsTabData" class="newsTabData" data-tab-content></div>
 
     <script src="mainScript.js"></script>
-
-
-    const company_tab_name = "Company";
-    const summary_tab_name = "Stock Summary";
-    const charts_tab_name = "Charts";
-    const news_tab_name = "Latest News";
-    let isDataRetrieved = false;
-
-
-    function getStockData() {
-    document.getElementById('searchInput').addEventListener('submit', function (ev) {
-    event.preventDefault();
-
-    const stockTickerSymbol = document.getElementById('searchText').value;
-
-    if (!isDataRetrieved) {
-    fetch(`/api?stockTickerSymbol=${encodeURIComponent(stockTickerSymbol)}`)
-    .then((response) => response.json()) // Return the promise
-    .then((data) => {
-    console.log(data);
-    const displayContainer = document.getElementById('resultData');
-
-    const stockDataTabs = document.createElement('div');
-    stockDataTabs.id = 'stockDataTabs';
-
-    const stockDataTabNames = [company_tab_name, summary_tab_name, charts_tab_name, news_tab_name];
-    stockDataTabNames.forEach((stockDataTabName, index) => {
-    const tabElement = document.createElement('div');
-    tabElement.textContent = stockDataTabName;
-    tabElement.className = 'stockDataTab';
-    tabElement.addEventListener('click', () => {
-    loadContentForTab(index, data);
-
-    stockDataTabs.appendChild(tabElement);
-    })
-    })
-
-    displayContainer.innerHTML = `<p>${JSON.stringify(data)}
-    <p>`;
-        isDataRetrieved = true;
-        }).catch((error) => {
-        console.error('Error in flask API: ', error);
-        document.getElementById("resultData").innerText = `Error fetching stock details: ${error}`;
-
-        })
-        }
-
-        });
-        }
-
-        function clearSearchInput() {
-        // document.getElementById('clearButton').value = '';
-        isDataRetrieved = false;
-        document.getElementById('resultData').innerHTML = '';
-        }
-
-        </script> -->
 </body>
 
 </html>
