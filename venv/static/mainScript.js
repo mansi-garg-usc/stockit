@@ -70,22 +70,43 @@ function clearActiveTabsAndHideContent() {
   document.querySelectorAll(".tabContent").forEach((content) => {
     content.style.display = "none";
   });
+  const errorDiv = document.getElementById("error");
+  errorDiv.innerHTML = "";
+  errorDiv.display = "none";
 }
+document.addEventListener("DOMContentLoaded", (event) => {
+  const searchForm = document.getElementById("searchInput");
+  searchForm.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    const stockTickerSymbol = document
+      .getElementById("searchText")
+      .value.toUpperCase();
+    fetchStockInfo(stockTickerSymbol);
+    fetchDataForTabs(stockTickerSymbol);
+  });
 
-async function getStockData() {
-  document
-    .getElementById("searchInput")
-    .addEventListener("submit", function (ev) {
-      ev.preventDefault();
+  // Attach any other event listeners here
+});
 
-      const stockTickerSymbol = document.getElementById("searchText").value;
-      fetchStockInfo(stockTickerSymbol);
-      fetchDataForTabs(stockTickerSymbol);
-    });
-}
+// async function getStockData() {
+//   document
+//     .getElementById("searchInput")
+//     .addEventListener("submit", function (ev) {
+//       ev.preventDefault();
+
+//       const stockTickerSymbol = document
+//         .getElementById("searchText")
+//         .value.toUpperCase();
+//       fetchStockInfo(stockTickerSymbol);
+//       fetchDataForTabs(stockTickerSymbol);
+//     });
+// }
 
 async function fetchStockInfo(stockTickerSymbol) {
   try {
+    const errorDivContainer = document.getElementById("error");
+    errorDivContainer.innerHTML = "";
+
     const response = await fetch(
       `/stockInfo?stockTickerSymbol=${encodeURIComponent(stockTickerSymbol)}`
     );
@@ -94,25 +115,39 @@ async function fetchStockInfo(stockTickerSymbol) {
     }
     const data = await response.json();
 
-    // if (data.length === undefined) {
-    //   const errorDiv = document.createElement("div");
-    //   errorDiv.style.display = "block";
-    //   errorDiv.style.backgroundColor = "grey";
-    //   errorDiv.style.height = "20px";
-    //   errorDiv.style.paddingTop = "1.5%";
-    //   errorDiv.innerHTML = `<p>Error: No record has been found, please enter a valid symbol</p>`;
-    //   //   errorDiv.style.border = "1px solid";
-    //   const errorDivContainer = document.getElementById("error");
-    //   //   errorDivContainer.style.display = "block";
-    //   errorDivContainer.appendChild(errorDiv);
-    //   return;
-    // } else {
-    const modulatedData = modulateCompanyData(data);
-    displayCompanyData(modulatedData);
-    document.getElementById("resultData").style.display = "flex";
-    document.getElementById("companyTabData").style.display = "flex";
-    activateTab(0);
-    // }
+    if (
+      data &&
+      Object.keys(data).length === 0 &&
+      Object.keys(data)[0] !== "error"
+    ) {
+      clearActiveTabsAndHideContent();
+      document.getElementById("resultData").style.display = "none";
+      document.getElementById("companyTabData").style.display = "none";
+      document.getElementById("stockSummaryTabData").style.display = "none";
+      document.getElementById("chartsTabData").style.display = "none";
+      document.getElementById("newsTabData").style.display = "none";
+      const errorDivContainer = document.getElementById("error");
+      errorDivContainer.innerHTML = "";
+      const errorDiv = document.createElement("p");
+      errorDiv.style.display = "block";
+      errorDiv.style.backgroundColor = "rgb(234 234 234)";
+      errorDiv.style.height = "20px";
+      errorDiv.style.padding = "14px 70px";
+      errorDiv.style.margin = "180px 150px";
+      errorDiv.style.width = "auto";
+      errorDiv.textContent = `Error: No record has been found, please enter a valid symbol`;
+      errorDiv.style.borderRadius = "12px";
+      errorDivContainer.appendChild(errorDiv);
+      errorDivContainer.style.display = "block";
+      //   errorDivContainer.style.bo
+      return;
+    } else {
+      const modulatedData = modulateCompanyData(data);
+      displayCompanyData(modulatedData);
+      document.getElementById("resultData").style.display = "flex";
+      document.getElementById("companyTabData").style.display = "flex";
+      activateTab(0);
+    }
   } catch (error) {
     //console.log("error in stockInfo - ", error);
   }
