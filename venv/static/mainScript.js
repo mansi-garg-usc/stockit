@@ -178,22 +178,34 @@ async function fetchDataForTabs(stockTickerSymbol) {
 
     const dataForAllTabs = await Promise.all(promises);
 
-    // let companyNewsData = dataForAllTabs.find(
-    //   (dataElements) => dataElements.apiName === "companyNews"
-    // );
-    // if (companyNewsData?.data.length === 0) {
-    //   return;
-    // } else {
-    dataForAllTabs.forEach(({ apiName, data }) => {
-      const dataModulationFunction = dataModulationFunctionMap[apiName];
-      const resultForEveryTab =
-        dataModulationFunction && dataModulationFunction(data);
-      let dataObject = dataObjectMap[apiName];
-      dataObject = resultForEveryTab;
-      let displayFunction = displayDataFunctionMap[apiName];
-      displayFunction && displayFunction(dataObject);
-    });
-    // }
+    let recommendationTrendsApiResult = dataForAllTabs.find(
+      (dataElements) => dataElements.apiName === "stockRecommendationTrends"
+    );
+
+    let companyNewsData = dataForAllTabs.find(
+      (dataElements) => dataElements.apiName === "companyNews"
+    );
+    if (companyNewsData?.data.length === 0) {
+      return;
+    } else {
+      dataForAllTabs.forEach(({ apiName, data }) => {
+        const dataModulationFunction = dataModulationFunctionMap[apiName];
+        let displayFunction = displayDataFunctionMap[apiName];
+        let dataObject = dataObjectMap[apiName];
+        let resultForEveryTab;
+        if (apiName === "stockSummary") {
+          resultForEveryTab =
+            dataModulationFunction && dataModulationFunction(data);
+          dataObject = resultForEveryTab;
+          displayFunction && displayFunction(dataObject);
+        } else {
+          resultForEveryTab =
+            dataModulationFunction && dataModulationFunction(data);
+          dataObject = resultForEveryTab;
+          displayFunction && displayFunction(dataObject);
+        }
+      });
+    }
   } catch (error) {
     //console.log(`error in fetchDataForAllTabs, - ${error}`);
   }
