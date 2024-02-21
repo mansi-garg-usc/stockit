@@ -269,21 +269,63 @@ ul {
   height: 300px;
 }
 
-/* #error {
-  display: none;
-  background-color: grey;
-  height: 35px;
-  width: 120%;
-  text-align: center;
-  padding: 5px;
-} */
-
 #stockSummaryTabData table {
   padding-top: 3%;
   margin-left: 25%;
   height: 75%;
   /* margin-right: 25%; */
   width: 58%;
+}
+
+#strongSellLabel {
+  color: red;
+  float: left;
+  word-wrap: break-word;
+  width: 70px;
+  margin-top: 0;
+}
+
+#strongBuyLabel {
+  color: green;
+  float: left;
+  word-wrap: break-word;
+  width: 70px;
+  margin-top: 0;
+  padding-left: 2%;
+}
+
+#strongsell {
+  background-color: red;
+  padding: 14px 12px;
+}
+
+#sell {
+  background-color: #b7410e;
+  padding: 14px 12.5px;
+}
+
+#hold {
+  background-color: olive;
+  padding: 14px 13px;
+}
+
+#buy {
+  background-color: #17b169;
+  padding: 14px 13.5px;
+}
+
+#strongbuy {
+  background-color: #4fffb0;
+  padding: 14px 14px;
+}
+
+#trendList {
+  margin: auto;
+  list-style-type: none;
+  padding: 0;
+  float: left;
+  overflow: hidden;
+  /* background-color: grey; */
 }
 
 #companyTabData tr {

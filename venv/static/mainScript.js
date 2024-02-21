@@ -179,7 +179,7 @@ async function fetchDataForTabs(stockTickerSymbol) {
     const dataForAllTabs = await Promise.all(promises);
 
     let recommendationTrendsApiResult = dataForAllTabs.find(
-      (dataElements) => dataElements.apiName === "stockRecommendationTrends"
+      (dataElements) => dataElements.apiName === "stockrecommendationTrends"
     );
 
     let companyNewsData = dataForAllTabs.find(
@@ -195,9 +195,14 @@ async function fetchDataForTabs(stockTickerSymbol) {
         let resultForEveryTab;
         if (apiName === "stockSummary") {
           resultForEveryTab =
-            dataModulationFunction && dataModulationFunction(data);
+            dataModulationFunction &&
+            dataModulationFunction(data, recommendationTrendsApiResult.data);
           dataObject = resultForEveryTab;
-          displayFunction && displayFunction(dataObject);
+          displayFunction &&
+            displayFunction(
+              dataObject.stockSummary,
+              dataObject.recommendationTrend
+            );
         } else {
           resultForEveryTab =
             dataModulationFunction && dataModulationFunction(data);
@@ -222,13 +227,16 @@ function modulateCompanyData(response) {
   return company_data;
 }
 
-function modulateStockSummary(response) {
+function modulateStockSummary(
+  stockSummaryResponse,
+  recommendationTrendsResponse
+) {
   //todo: use ticker from company data
   let stock_summary = {};
-  for (attribute in response) {
+  for (attribute in stockSummaryResponse) {
     if (attribute in attribute_mapping_stock_summary) {
       stock_summary[attribute_mapping_stock_summary[attribute]] =
-        response[attribute];
+        stockSummaryResponse[attribute];
     }
   }
 
@@ -238,7 +246,32 @@ function modulateStockSummary(response) {
   const month = date.toLocaleString("default", { month: "long" });
   const year = date.getFullYear();
   stock_summary["trading_day"] = `${day} ${month}, ${year}`;
-  return stock_summary;
+
+  function parseDate(dateString) {
+    return new Date(dateString);
+  }
+
+  // Find the latest period data object
+  const latestDateData = recommendationTrendsResponse.reduce(
+    (latest, current) => {
+      return parseDate(latest.period) > parseDate(current.period)
+        ? latest
+        : current;
+    }
+  );
+
+  let recommendationTrendData = [
+    { text: "strongsell", value: latestDateData.strongSell },
+    { text: "sell", value: latestDateData.sell },
+    { text: "hold", value: latestDateData.hold },
+    { text: "buy", value: latestDateData.buy },
+    { text: "strongbuy", value: latestDateData.strongBuy },
+  ];
+
+  return {
+    stockSummary: stock_summary,
+    recommendationTrend: recommendationTrendData,
+  };
 }
 
 // function modulateRecommendationTrends(response) {
@@ -436,7 +469,9 @@ function displayCompanyData(companyData) {
   containerDiv.appendChild(table);
 }
 
-function displayStockSummaryData(stockSummaryData) {
+function displayStockSummaryData(stockSummaryData, recommendationTrend) {
+  const stockSummaryTabContent = document.getElementById("stockSummaryTabData");
+  stockSummaryTabContent.innerHTML = "";
   const stockTickerSymbol = document
     .getElementById("searchText")
     .value.toUpperCase();
@@ -509,55 +544,50 @@ function displayStockSummaryData(stockSummaryData) {
 
   table.appendChild(fragmentContainer);
 
-  const stockSummaryTabContent = document.getElementById("stockSummaryTabData");
-  stockSummaryTabContent.innerHTML = "";
+  let trendDiv = document.createElement("div");
+  let strongSellText = document.createElement("p");
+  strongSellText.innerHTML = "Strong Sell";
+  strongSellText.id = "strongSellLabel";
+  let strongBuyText = document.createElement("p");
+  strongBuyText.innerHTML = "Strong Buy";
+  strongBuyText.id = "strongBuyLabel";
+  let trend = document.createElement("ul");
+  trend.id = "trendList";
+  let caption = document.createElement("p");
+  caption.innerHTML = "Recommendation Trends";
+  caption.id = "trendCaption";
+  caption.style.paddingLeft = "33%";
+
+  trendDiv.appendChild(strongSellText);
+  recommendationTrend.forEach((trendVal) => {
+    let trendBox = document.createElement("li");
+    trendBox.innerHTML = trendVal.value;
+    trendBox.id = trendVal.text;
+    trendBox.style.textAlign = "center";
+    trendBox.style.display = "block";
+    trendBox.style.float = "left";
+
+    trend.appendChild(trendBox);
+  });
+
+  trendDiv.appendChild(trend);
+  trendDiv.appendChild(strongBuyText);
+  trendDiv.id = "trendDiv";
+  trendDiv.style.display = "inline-block";
+  trendDiv.style.paddingTop = "5%";
+  trendDiv.style.width = "600px";
+  trendDiv.style.paddingLeft = "20%";
+  trendDiv.style.fontSize = "20px";
+
   stockSummaryTabContent.appendChild(table);
+  stockSummaryTabContent.appendChild(trendDiv);
+  stockSummaryTabContent.appendChild(caption);
 }
-
-// function displayRecommendationTrendsData(recommendationTrendsData) {
-//   //   const widgetContainer = document.getElementById("recommendationTrends");
-//   //   widgetContainer.innerHTML = ""; // Clear the container
-
-//   // Create elements for each recommendation category
-//   const categories = ["strongSell", "sell", "hold", "buy", "strongBuy"];
-//   const categoryNames = ["Strong Sell", "Sell", "Hold", "Buy", "Strong Buy"];
-//   const categoryColors = [
-//     "#d9534f",
-//     "#f0ad4e",
-//     "#5bc0de",
-//     "#5cb85c",
-//     "#5cb85c",
-//   ];
-
-//   categories.forEach((category, index) => {
-//     // Create the container for each trend category
-//     const trendDiv = document.createElement("div");
-//     trendDiv.classList.add("trend");
-//     trendDiv.style.backgroundColor = categoryColors[index]; // Set the background color
-
-//     // Create the label
-//     const labelSpan = document.createElement("span");
-//     labelSpan.textContent = categoryNames[index];
-//     labelSpan.style.marginRight = "5px";
-
-//     // Create the value container
-//     const valueSpan = document.createElement("span");
-//     valueSpan.textContent = recommendationTrendsData[category];
-
-//     // Append the label and value to the trend container
-//     trendDiv.appendChild(labelSpan);
-//     trendDiv.appendChild(valueSpan);
-
-//     // Append the trend container to the widget container
-//     recommendationTrendsElement = trendDiv;
-//   });
-// }
 
 function displayNewsData(newsData) {
   const newsTable = document.createElement("table");
   newsTable.classList.add("news-table");
 
-  // Iterate over the newsData array
   newsData.forEach((newsItem) => {
     const newsRow = document.createElement("tr"); // Table row for each news item
 
