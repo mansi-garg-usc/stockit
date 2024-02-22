@@ -6,6 +6,7 @@ let isDataRetrieved = false;
 let modulatedStockSummaryData;
 let modulatedChartsData;
 let modulatedNewsData;
+let maxVolumeForCharts;
 //let recommendationTrendsElement;
 const dataModulationFunctionMap = {
   stockSummary: modulateStockSummary,
@@ -84,23 +85,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     fetchStockInfo(stockTickerSymbol);
     fetchDataForTabs(stockTickerSymbol);
   });
-
-  // Attach any other event listeners here
 });
-
-// async function getStockData() {
-//   document
-//     .getElementById("searchInput")
-//     .addEventListener("submit", function (ev) {
-//       ev.preventDefault();
-
-//       const stockTickerSymbol = document
-//         .getElementById("searchText")
-//         .value.toUpperCase();
-//       fetchStockInfo(stockTickerSymbol);
-//       fetchDataForTabs(stockTickerSymbol);
-//     });
-// }
 
 async function fetchStockInfo(stockTickerSymbol) {
   try {
@@ -137,6 +122,7 @@ async function fetchStockInfo(stockTickerSymbol) {
       errorDiv.style.width = "auto";
       errorDiv.textContent = `Error: No record has been found, please enter a valid symbol`;
       errorDiv.style.borderRadius = "12px";
+      errorDiv.style.fontSize = "18px";
       errorDivContainer.appendChild(errorDiv);
       errorDivContainer.style.display = "block";
       //   errorDivContainer.style.bo
@@ -241,7 +227,7 @@ function modulateStockSummary(
   }
 
   const unixTimeStamp = stock_summary["trading_day"];
-  const date = new Date(unixTimeStamp);
+  const date = new Date(unixTimeStamp * 1000);
   const day = date.getDate();
   const month = date.toLocaleString("default", { month: "long" });
   const year = date.getFullYear();
@@ -339,13 +325,11 @@ function modulateCharts(response) {
   }
 
   for (let item of data) {
-    let volumeItem = [
-      item["t"], // Date
-      item["v"], // Volume
-    ];
+    let volumeItem = [item["t"], item["v"]];
     volumeData.push(volumeItem);
   }
 
+  maxVolumeForCharts = Math.max(...volumeData.map((obj) => obj[1]));
   return (modulatedHighChartsData = {
     closePriceData: closePriceData,
     volumeData: volumeData,
@@ -423,7 +407,7 @@ function displayCompanyData(companyData) {
   table.style.paddingTop = "3%";
   table.style.margin = "auto";
   table.style.height = "75%";
-  table.style.width = "46%";
+  table.style.width = "65%";
 
   const fragmentContainer = document.createDocumentFragment();
 
@@ -432,9 +416,10 @@ function displayCompanyData(companyData) {
     logoImg.src = companyData["company_logo"];
     logoImg.style.display = "block";
     logoImg.style.margin = "auto";
-    logoImg.style.height = "85px";
+    logoImg.style.height = "110px";
     logoImg.style.width = "auto";
     logoImg.style.paddingBottom = "2%";
+    logoImg.style.paddingTop = "3%";
     containerDiv.appendChild(logoImg);
   }
   orderOfKeys.forEach((key) => {
@@ -455,10 +440,10 @@ function displayCompanyData(companyData) {
       keyCell.style.width = "48%";
       valueCell.style.textAlign = "left";
       valueCell.style.paddingLeft = "2%";
-      keyCell.style.borderTop = "1px solid #ccc";
-      valueCell.style.borderTop = "1px solid #ccc";
-      keyCell.style.borderBottom = "1px solid #ccc";
-      valueCell.style.borderBottom = "1px solid #ccc";
+      keyCell.style.borderTop = "1px solid rgb(242 238 238)";
+      valueCell.style.borderTop = "1px solid rgb(242 238 238)";
+      keyCell.style.borderBottom = "1px solid rgb(242 238 238)";
+      valueCell.style.borderBottom = "1px solid rgb(242 238 238)";
       row.appendChild(keyCell);
       row.appendChild(valueCell);
       fragmentContainer.appendChild(row);
@@ -485,14 +470,15 @@ function displayStockSummaryData(stockSummaryData, recommendationTrend) {
     "change",
     "change_percent",
   ];
+  stockSummaryTabContent.style.paddingTop = "2%";
 
   const table = document.createElement("table");
   table.classList.add("stockSummary-data-table");
   table.style.borderCollapse = "collapse";
-  table.style.paddingTop = "3%";
+  table.style.paddingTop = "5%";
   table.style.margin = "auto";
-  table.style.height = "75%";
-  table.style.width = "100%";
+  table.style.height = "100%";
+  table.style.width = "65%";
   const fragmentContainer = document.createDocumentFragment();
 
   orderOfKeys.forEach((key) => {
@@ -513,7 +499,7 @@ function displayStockSummaryData(stockSummaryData, recommendationTrend) {
 
       const arrowImg = document.createElement("img");
       arrowImg.style.marginLeft = "5px";
-      arrowImg.style.width = "5%";
+      arrowImg.style.width = "8%";
 
       if (value < 0) {
         arrowImg.src = "images/RedArrowDown.png";
@@ -531,10 +517,10 @@ function displayStockSummaryData(stockSummaryData, recommendationTrend) {
     keyCell.style.width = "48%";
     valueCell.style.textAlign = "left";
     valueCell.style.paddingLeft = "2%";
-    keyCell.style.borderTop = "1px solid #ccc";
-    valueCell.style.borderTop = "1px solid #ccc";
-    keyCell.style.borderBottom = "1px solid #ccc";
-    valueCell.style.borderBottom = "1px solid #ccc";
+    keyCell.style.borderTop = "1px solid rgb(242 238 238)";
+    valueCell.style.borderTop = "1px solid rgb(242 238 238)";
+    keyCell.style.borderBottom = "1px solid rgb(242 238 238)";
+    valueCell.style.borderBottom = "1px solid rgb(242 238 238)";
 
     row.appendChild(keyCell);
     row.appendChild(valueCell);
@@ -553,10 +539,14 @@ function displayStockSummaryData(stockSummaryData, recommendationTrend) {
   strongBuyText.id = "strongBuyLabel";
   let trend = document.createElement("ul");
   trend.id = "trendList";
+  trend.style.color = "white";
   let caption = document.createElement("p");
   caption.innerHTML = "Recommendation Trends";
   caption.id = "trendCaption";
   caption.style.paddingLeft = "33%";
+  caption.style.paddingBottom = "15%";
+  caption.style.fontSize = "20px";
+  caption.style.margin = "auto";
 
   trendDiv.appendChild(strongSellText);
   recommendationTrend.forEach((trendVal) => {
@@ -598,8 +588,8 @@ function displayNewsData(newsData) {
     img.src = newsItem.image;
     img.alt = newsItem.title;
     img.classList.add("news-image");
-    img.style.width = "95px";
-    img.style.height = "95px";
+    img.style.width = "105px";
+    img.style.height = "105px";
     imgCell.appendChild(img);
     newsRow.appendChild(imgCell); // Append image cell to the row
 
@@ -636,26 +626,26 @@ function displayNewsData(newsData) {
     link.style.margin = "0";
     textCell.appendChild(link);
 
-    // Append text cell to the row
     newsRow.appendChild(textCell);
 
-    // Append the newsRow to the newsTable
     newsTable.appendChild(newsRow);
   });
 
   const newsTabData = document.getElementById("newsTabData");
-  newsTabData.innerHTML = ""; // Clear existing content
+  newsTabData.innerHTML = "";
   newsTabData.appendChild(newsTable);
 }
 
 function highChartsClosePrice(data) {
+  let today = new Date();
+  let formattedDate = today.toISOString().substring(0, 10);
   const stockTickerSymbol = document
     .getElementById("searchText")
     .value.toUpperCase();
   if (typeof Highcharts !== "undefined") {
     Highcharts.stockChart("chartsTabData", {
       chart: {
-        height: "500px",
+        height: "560px",
       },
       subtitle: {
         text: '<a href="https://polygon.io/" target="_blank_">Source: Polygon.io</a>',
@@ -693,32 +683,30 @@ function highChartsClosePrice(data) {
         inputEnabled: false,
       },
       title: {
-        text: `${stockTickerSymbol} Stock Price`,
+        text: `Stock Price ${stockTickerSymbol} ${formattedDate}`,
       },
       yAxis: [
         {
           title: {
             text: "Stock Price",
-            opposite: true,
           },
           opposite: false,
         },
         {
           title: {
             text: "Volume",
-            opposite: false,
           },
           opposite: true,
           min: 0,
-          max: 500000000,
-          //   tickInterval: 80000000,
+          max: maxVolumeForCharts * 2,
         },
       ],
       series: [
         {
-          name: `${stockTickerSymbol} Stock Price`,
+          name: `Stock Price`,
           data: data.closePriceData,
           type: "area",
+          gapSize: 5,
           tooltip: {
             valueDecimals: 2,
           },
@@ -748,6 +736,7 @@ function highChartsClosePrice(data) {
           data: data.volumeData,
           yAxis: 1,
           color: "black",
+          showInNavigator: false,
         },
       ],
       plotOptions: {
@@ -764,5 +753,6 @@ function highChartsClosePrice(data) {
 function displayChartsData(chartsData) {
   const chartsTabData = document.getElementById("chartsTabData");
   chartsTabData.innerHTML = "";
+  chartsTabData.style.paddingTop = "1%";
   highChartsClosePrice(chartsData);
 }

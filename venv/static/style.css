@@ -13,9 +13,6 @@ body {
 }
 
 .parent {
-  /* background-image: url(images/back.svg);
-  background-position: top;
-  background-repeat: no-repeat; */
   background-size: cover;
   width: 100%;
   height: 100%;
@@ -36,7 +33,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 70vw;
+  width: 100%;
   max-width: 400px;
   margin: auto;
   /* margin-top: 50vh; */
@@ -69,27 +66,23 @@ body {
 .search-container-root {
   display: flex;
   flex-direction: row;
-  /* --target-size: 48px; */
-  /* --box-height: var(var(--target-size));
-  height: var(var(--box-height)); */
-  max-width: 561px;
+  max-width: 570px;
   /* width: 40%; */
   box-shadow: #708090;
-  /* border-radius: calc(var(--box-height) / 3); */
   border-width: 2px;
-  /* border: 1px solid #5f6368; */
-  /* min-height: 44px; */
+  width: 100%;
   align-items: center;
   background: #fff;
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
   border-radius: 15px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
 }
 
 .form-css {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 
 .search-bar-content {
@@ -101,7 +94,7 @@ body {
   display: flex;
   align-items: center;
   height: 46px;
-  width: 8%;
+  width: 7.25%;
   padding-left: 3%;
 }
 
@@ -116,17 +109,26 @@ body {
   background: none;
   border: none;
   cursor: pointer;
+  color: lightgray;
 }
 
 .search-icon-inline svg {
   cursor: pointer;
 }
+.search-icon-inline svg:hover {
+  color: grey;
+}
+
+.search-clear-button svg:hover {
+  color: grey;
+}
 
 .search-clear-button {
   line-height: 20px;
-  height: 70%;
-  width: 40%;
-  /* border-left: thin solid #d4d4d4; */
+  height: 69%;
+  width: 88%;
+  display: flex;
+  margin: 0 auto;
 }
 
 .search-clear-button svg {
@@ -142,11 +144,25 @@ body {
 }
 
 .search-container-root input {
-  border-right: 1px solid grey;
+  border-right: 1px solid lightgrey;
+  color: #979595;
 }
 
 .search-container-root input:invalid {
-  border-right: 1px solid grey;
+  border-right: 1px solid lightgrey;
+}
+
+.search-container-root input::placeholder {
+  color: #979595;
+  opacity: 1;
+}
+
+input:-ms-input-placeholder {
+  color: #979595;
+}
+
+input::-ms-input-placeholder {
+  color: #979595;
 }
 
 .text-area {
@@ -164,15 +180,6 @@ body {
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;
-  /* overflow-x: hidden;
-  background-color: transparent;
-  outline: none;
-  word-wrap: break-word;
-  margin: 0;
-  border: none;
-  color: grey;
-  width: 100%;
-  appearance: none; */
 }
 
 input[type="search"]::-webkit-search-clear-button,
@@ -187,36 +194,29 @@ input[type="search"]::-webkit-search-cancel-button {
   padding-right: 2%;
 }
 
-.search-clear-button {
-  display: flex;
-  margin: 0 auto;
-  line-height: 20px;
-  height: 70%;
-  width: 100%;
-}
-
 #tabsList {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   list-style-type: none;
   padding: 0;
   margin: 0;
-  width: 70%;
-  background-color: lightgray;
-  height: 50px;
+  width: 56%;
+  background-color: #F8F9FA;
+  height: 100%;
 }
 
 #resultData {
   display: none;
   align-items: center;
   padding: 0;
-  background-color: lightgray;
-  width: 80%;
-  height: 50px;
+  background-color: #F8F9FA;
+  width: 66%;
+  height: 58px;
   font-family: sans-serif;
   align-content: center;
-  margin-top: 16%;
-  margin-bottom: 2%;
+  margin-top: 12%;
+  margin-bottom: 0%;
+  line-height: 1.95;
 }
 
 ul {
@@ -233,12 +233,12 @@ ul {
 }
 
 .tabButton:hover {
-  background-color: grey;
+  background-color: #dedbdb;
   cursor: pointer;
 }
 
 .tabButton.active {
-  background-color: grey;
+  background-color: #c4c2c2;
 }
 
 .tabButton a {
@@ -252,21 +252,19 @@ ul {
 }
 
 #companyTabData {
-  width: 80%;
-  font-size: 0.9rem;
+  width: 66%;
   height: 240px;
 }
 
 #companyTabData table {
   padding-top: 3%;
   margin-left: 25%;
-  height: 75%;
-  /* margin-right: 25%; */
-  width: 58%;
+  height: 68%;
 }
 
-#stockSummaryData {
-  height: 300px;
+#stockSummaryTabData {
+  height: 250px;
+  padding-top: "2%";
 }
 
 #stockSummaryTabData table {
@@ -283,6 +281,7 @@ ul {
   word-wrap: break-word;
   width: 70px;
   margin-top: 0;
+  text-align: center;
 }
 
 #strongBuyLabel {
@@ -291,17 +290,18 @@ ul {
   word-wrap: break-word;
   width: 70px;
   margin-top: 0;
-  padding-left: 2%;
+  padding-left: 1%;
+  text-align: center;
 }
 
 #strongsell {
   background-color: red;
-  padding: 14px 12px;
+  padding: 14px 13px;
 }
 
 #sell {
   background-color: #b7410e;
-  padding: 14px 12.5px;
+  padding: 14px 13px;
 }
 
 #hold {
@@ -325,7 +325,6 @@ ul {
   padding: 0;
   float: left;
   overflow: hidden;
-  /* background-color: grey; */
 }
 
 #companyTabData tr {
@@ -334,14 +333,16 @@ ul {
 }
 
 #chartsTabData {
-  width: 80%;
+  width: 66%;
+  padding-top: "2%";
 }
 
 #newsTabData {
-  width: 80%;
-  font-size: 12px;
+  width: 66%;
+  font-size: 15.25px;
   height: 100%;
   overflow-y: auto;
+  line-height: 1.15;
 }
 #newsTabData .news-content {
   margin-top: 20px;
@@ -350,11 +351,16 @@ ul {
 .news-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 10px;
+  border-spacing: 0 30px;
+}
+
+#newsTabData table tr:first-child td,
+#newsTabData table tr:first-child th {
+  border-top: none;
 }
 
 .news-table tr {
-  background-color: #f2f2f2;
+  background-color: #F8F9FA;
 }
 
 .news-table td {
