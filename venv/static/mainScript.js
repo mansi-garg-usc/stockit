@@ -7,19 +7,16 @@ let modulatedStockSummaryData;
 let modulatedChartsData;
 let modulatedNewsData;
 let maxVolumeForCharts;
-//let recommendationTrendsElement;
 const dataModulationFunctionMap = {
   stockSummary: modulateStockSummary,
   companyNews: modulateNews,
   highCharts: modulateCharts,
-  //recommendationTrends: modulateRecommendationTrends,
 };
 
 const displayDataFunctionMap = {
   stockSummary: displayStockSummaryData,
   companyNews: displayNewsData,
   highCharts: displayChartsData,
-  //recommendationTrends: displayRecommendationTrendsData,
 };
 
 const dataObjectMap = {
@@ -125,7 +122,6 @@ async function fetchStockInfo(stockTickerSymbol) {
       errorDiv.style.fontSize = "18px";
       errorDivContainer.appendChild(errorDiv);
       errorDivContainer.style.display = "block";
-      //   errorDivContainer.style.bo
       return;
     } else {
       const modulatedData = modulateCompanyData(data);
@@ -209,7 +205,6 @@ function modulateCompanyData(response) {
       company_data[attribute_mapping_company[attribute]] = response[attribute];
     }
   }
-  //console.log(company_data);
   return company_data;
 }
 
@@ -217,7 +212,6 @@ function modulateStockSummary(
   stockSummaryResponse,
   recommendationTrendsResponse
 ) {
-  //todo: use ticker from company data
   let stock_summary = {};
   for (attribute in stockSummaryResponse) {
     if (attribute in attribute_mapping_stock_summary) {
@@ -237,7 +231,6 @@ function modulateStockSummary(
     return new Date(dateString);
   }
 
-  // Find the latest period data object
   const latestDateData = recommendationTrendsResponse.reduce(
     (latest, current) => {
       return parseDate(latest.period) > parseDate(current.period)
@@ -260,21 +253,6 @@ function modulateStockSummary(
   };
 }
 
-// function modulateRecommendationTrends(response) {
-//   function parseDate(dateString) {
-//     return new Date(dateString);
-//   }
-
-//   // Find the latest period data object
-//   const latestDateData = response.reduce((latest, current) => {
-//     return parseDate(latest.period) > parseDate(current.period)
-//       ? latest
-//       : current;
-//   });
-
-//   return latestDateData;
-// }
-
 function modulateNews(response) {
   const orderOfKeys = ["image", "headline", "datetime", "url"];
   const attribute_mapping_news = {
@@ -287,7 +265,6 @@ function modulateNews(response) {
   const validNewsItems = [];
   let mappedNewsItems = [];
 
-  // Collect up to 5 valid news items
   for (let item of response) {
     const isValidItem = orderOfKeys.every(
       (key) => item.hasOwnProperty(key) && item[key]
@@ -300,7 +277,6 @@ function modulateNews(response) {
     }
   }
 
-  // Map the attributes for each valid news item
   for (let item of validNewsItems) {
     let news = {};
     for (let attribute in item) {
@@ -311,7 +287,6 @@ function modulateNews(response) {
     mappedNewsItems.push(news);
   }
 
-  //console.log(mappedNewsItems);
   return mappedNewsItems;
 }
 
@@ -373,7 +348,6 @@ function activateTab(tabIndex) {
       tab.classList.add("active");
       let tabDataId = tab.getAttribute("data-tab-target");
       document.getElementById(tabDataId).style.display = "block";
-      //   tab.CDATA_SECTION_NODE.
     } else {
       let tabDataId = tab.getAttribute("data-tab-target");
       document.getElementById(tabDataId).style.display = "none";
@@ -579,9 +553,8 @@ function displayNewsData(newsData) {
   newsTable.classList.add("news-table");
 
   newsData.forEach((newsItem) => {
-    const newsRow = document.createElement("tr"); // Table row for each news item
+    const newsRow = document.createElement("tr");
 
-    // Create the image element in its own table cell
     const imgCell = document.createElement("td");
     imgCell.classList.add("news-image-cell");
     const img = document.createElement("img");
@@ -591,22 +564,19 @@ function displayNewsData(newsData) {
     img.style.width = "105px";
     img.style.height = "105px";
     imgCell.appendChild(img);
-    newsRow.appendChild(imgCell); // Append image cell to the row
+    newsRow.appendChild(imgCell);
 
-    // Create a cell for the text content
     const textCell = document.createElement("td");
     textCell.classList.add("news-text-cell");
 
-    // Create the title element
     const title = document.createElement("h3");
     title.textContent = newsItem.title;
     title.classList.add("news-title");
     title.style.margin = "0";
     textCell.appendChild(title);
 
-    // Create the date element
     const date = document.createElement("p");
-    const dateObject = new Date(newsItem.date * 1000); // assuming the date is a timestamp
+    const dateObject = new Date(newsItem.date * 1000);
     date.textContent = dateObject.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -616,7 +586,6 @@ function displayNewsData(newsData) {
     date.style.margin = "0";
     textCell.appendChild(date);
 
-    // Create the link element
     const link = document.createElement("a");
     link.href = newsItem.link_to_post;
     link.textContent = "See Original Post";

@@ -11,40 +11,6 @@ executor = ThreadPoolExecutor()
 def index():
     return send_file('entry.html')
 
-# def make_api_call(api_url):
-#     try:
-#         response = requests.get(api_url)
-#         response.raise_for_status()
-#     except requests.exceptions.RequestException as e:
-#         return {'error': f'Failed to fetch data: {e}'}
-#     if response.status_code == 200:
-#         print(response.json())
-#         return response.json()
-#     else:
-#         print(f'Error: {response.status_code} - {response.text}')
-#         return response.text
-
-# @app.route('/api', methods=['GET'])
-# def get_stock_data():
-#     stock_ticker_symbol = request.args.get('stockTickerSymbol')
-
-#     if not stock_ticker_symbol:
-#         return jsonify({'error': 'Stock symbol is required'}), 400
-
-#     api_functions = [get_stock_details, get_stock_summary, get_stock_recommendation_trends, get_company_news, get_stock_highCharts]  # Add more functions as needed
-#     result = dict()
-#     for func in api_functions:
-#         key = func.__name__
-#         result[key] = func(stock_ticker_symbol)
-#         # result.update(func(stock_ticker_symbol))
-#         # result+= func(stock_ticker_symbol)
-    
-#     # api_urls = [func(stock_ticker_symbol) for func in api_functions]
-
-#     # results = list(executor.map(make_api_call, api_urls))
-
-#     return jsonify(result)
-
 @app.route('/stockInfo', methods=['GET'])
 def get_stock_details():
     api_key = 'cmu5ht9r01qsv99m22c0cmu5ht9r01qsv99m22cg'
@@ -154,25 +120,16 @@ def get_company_news():
 
 @app.route('/highCharts', methods=['GET'])
 def get_stock_highCharts():
-    # actual
     api_key = 'Veu4EyzzJTduRuvf0Y1woy5mwtn1mMIA'
     stockTickerSymbol = request.args.get('stockTickerSymbol')
     endDate = datetime.now().date()
     startDate = endDate - relativedelta(months=6, days=1)
-    end_epoch_time = endDate  #int(datetime.combine(endDate, time.min).timestamp())
-    start_epoch_time = startDate #int(datetime.combine(startDate, time.min).timestamp())
+    end_epoch_time = endDate
+    start_epoch_time = startDate
     multiplier = 1
     timespan = "day"
-    # print("stockTickerSymbol:", stockTickerSymbol)
     api_url = f'https://api.polygon.io/v2/aggs/ticker/{stockTickerSymbol}/range/{multiplier}/{timespan}/{start_epoch_time}/{end_epoch_time}?adjusted=true&sort=asc&apiKey={api_key}'
     
-    # temp
-    
-    # api_key = 'cmu5ht9r01qsv99m22c0cmu5ht9r01qsv99m22cg'
-    # stockTickerSymbol = request.args.get('stockTickerSymbol')
-    # print("stockTickerSymbol:", stockTickerSymbol)
-    # api_url = f'https://finnhub.io/api/v1/stock/profile2?symbol={stockTickerSymbol}&token={api_key}'
-    # print("API URL:", api_url)
     if not stockTickerSymbol:
         return jsonify({'error': 'Stock symbol is required'}), 400
 
