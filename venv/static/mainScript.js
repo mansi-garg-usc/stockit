@@ -227,13 +227,13 @@ function modulateStockSummary(
   const year = date.getFullYear();
   stock_summary["trading_day"] = `${day} ${month}, ${year}`;
 
-  function parseDate(dateString) {
+  function parseDateFormat(dateString) {
     return new Date(dateString);
   }
 
   const latestDateData = recommendationTrendsResponse.reduce(
     (latest, current) => {
-      return parseDate(latest.period) > parseDate(current.period)
+      return parseDateFormat(latest.period) > parseDateFormat(current.period)
         ? latest
         : current;
     }
@@ -667,7 +667,7 @@ function highChartsClosePrice(data) {
           },
           opposite: true,
           min: 0,
-          max: maxVolumeForCharts * 2,
+          max: maxVolumeForCharts ? maxVolumeForCharts * 2 : 40000000,
         },
       ],
       series: [
@@ -711,6 +711,9 @@ function highChartsClosePrice(data) {
       plotOptions: {
         column: {
           pointWidth: 5,
+        },
+        series: {
+          pointPlacement: "on",
         },
       },
     });

@@ -28,7 +28,7 @@ def get_stock_details():
         print(f'error making GET request: {e}')
     if response.status_code == 200:
         data = response.json()
-        print(data)
+        # print(data)
         return data
     else:
         # print( 'stocktickerSymbol', {stockTickerSymbol})
@@ -41,9 +41,9 @@ def get_stock_details():
 def get_stock_summary():
     api_key = 'cmu5ht9r01qsv99m22c0cmu5ht9r01qsv99m22cg'
     stockTickerSymbol = request.args.get('stockTickerSymbol')
-    print("stockTickerSymbol:", stockTickerSymbol)
+    # print("stockTickerSymbol:", stockTickerSymbol)
     api_url = f'https://finnhub.io/api/v1/quote?symbol={stockTickerSymbol}&token={api_key}'
-    print("API URL:", api_url)
+    # print("API URL:", api_url)
     if not stockTickerSymbol:
         return jsonify({'error': 'Stock symbol is required'}), 400
 
@@ -56,8 +56,8 @@ def get_stock_summary():
         data = response.json()
         return data
     else:
-        print( 'stocktickerSymbol', {stockTickerSymbol})
-        print(f'Error: {response.status_code} - {response.text}')
+        # print( 'stocktickerSymbol', {stockTickerSymbol})
+        # print(f'Error: {response.status_code} - {response.text}')
         return response.text
         # return jsonify({'error': 'Failed to fetch the stock details'}), 500
 
@@ -66,9 +66,9 @@ def get_stock_summary():
 def get_stock_recommendation_trends():
     api_key = 'cmu5ht9r01qsv99m22c0cmu5ht9r01qsv99m22cg'
     stockTickerSymbol = request.args.get('stockTickerSymbol')
-    print("stockTickerSymbol:", stockTickerSymbol)
+    # print("stockTickerSymbol:", stockTickerSymbol)
     api_url = f'https://finnhub.io/api/v1/stock/recommendation?symbol={stockTickerSymbol}&token={api_key}'
-    print("API URL:", api_url)
+    # print("API URL:", api_url)
     if not stockTickerSymbol:
         return jsonify({'error': 'Stock symbol is required'}), 400
 
@@ -79,10 +79,10 @@ def get_stock_recommendation_trends():
         print(f'error making GET request: {e}')
     if response.status_code == 200:
         data = response.json()
-        print("data", data)
+        # print("data", data)
         return data
     else:
-        print( 'stocktickerSymbol', {stockTickerSymbol})
+        # print( 'stocktickerSymbol', {stockTickerSymbol})
         print(f'Error: {response.status_code} - {response.text}')
         return response.text
         # return jsonify({'error': 'Failed to fetch the stock details'}), 500
@@ -94,11 +94,11 @@ def get_company_news():
     stockTickerSymbol = request.args.get('stockTickerSymbol')
     endDate = datetime.now().date()
     startDate = endDate - relativedelta(days=30)
-    print("stockTickerSymbol:", stockTickerSymbol)
-    print("startDate", startDate)
-    print("endDate", endDate)
+    # print("stockTickerSymbol:", stockTickerSymbol)
+    # print("startDate", startDate)
+    # print("endDate", endDate)
     api_url = f'https://finnhub.io/api/v1/company-news?symbol={stockTickerSymbol}&from={startDate}&to={endDate}&token={api_key}'
-    print("API URL:", api_url)
+    # print("API URL:", api_url)
     if not stockTickerSymbol:
         return jsonify({'error': 'Stock symbol is required'}), 400
 
@@ -109,10 +109,10 @@ def get_company_news():
         print(f'error making GET request: {e}')
     if response.status_code == 200:
         data = response.json()
-        print("data", data)
+        # print("data", data)
         return data
     else:
-        print( 'stocktickerSymbol', {stockTickerSymbol})
+        # print( 'stocktickerSymbol', {stockTickerSymbol})
         print(f'Error: {response.status_code} - {response.text}')
         return response.text
         # return jsonify({'error': 'Failed to fetch the stock details'}), 500
@@ -148,4 +148,4 @@ def get_stock_highCharts():
         # return jsonify({'error': 'Failed to fetch the stock details'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True, port=8000)
+    app.run(debug=False, use_reloader=True, port=8000)
