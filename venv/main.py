@@ -148,4 +148,4 @@ def get_stock_highCharts():
         # return jsonify({'error': 'Failed to fetch the stock details'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=False, use_reloader=True, port=8000)
+    app.run(debug=True, use_reloader=True, port=8000)

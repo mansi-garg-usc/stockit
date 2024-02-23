@@ -190,6 +190,7 @@ ul {
   display: flex;
   justify-content: center;
   align-items: center;
+  white-space: nowrap;
 }
 
 .tabButton:hover {
@@ -220,6 +221,7 @@ ul {
   padding-top: 3%;
   margin-left: 25%;
   height: 68%;
+  white-space: nowrap;
 }
 
 #stockSummaryTabData {

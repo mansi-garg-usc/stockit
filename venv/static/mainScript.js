@@ -606,8 +606,11 @@ function displayNewsData(newsData) {
 }
 
 function highChartsClosePrice(data) {
-  let today = new Date();
-  let formattedDate = today.toISOString().substring(0, 10);
+  let currentDate = new Date();
+  let year = currentDate.getFullYear();
+  let month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  let date = String(currentDate.getDate()).padStart(2, "0");
+  let formattedDate = `${year}-${month}-${date}`;
   const stockTickerSymbol = document
     .getElementById("searchText")
     .value.toUpperCase();
